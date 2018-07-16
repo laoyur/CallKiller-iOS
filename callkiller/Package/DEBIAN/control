@@ -1,0 +1,17 @@
+Package: com.laoyur.callkiller
+Name: callkiller
+Version: 1.0.0
+Description: kill the fvcking annoying spamming calls
+Section: System
+Depends: firmware (>= 11.0), mobilesubstrate
+Conflicts: 
+Replaces: 
+Priority: optional
+Architecture: iphoneos-arm
+Author: laoyur
+dev: 
+Homepage: 
+Depiction: 
+Maintainer: laoyur
+Icon: 
+
