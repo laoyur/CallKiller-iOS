@@ -1,8 +1,9 @@
 # 截图
-![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-29-32.jpg])
-![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-29-21.jpg)
-![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-29-27.jpg)
-![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-28-50.jpg)
+![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-00.jpg)
+![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-09.jpg)
+![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-14.jpg)
+![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-18.jpg)
+
 
 # changes in 1.1.0
   * 终于有GUI设置界面了
