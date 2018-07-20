@@ -10,6 +10,13 @@
 #import "GCDObjC/GCDObjC.h"
 #import "fmdb/FMDB.h"
 
-@interface statics : NSObject
-
+@protocol MutableDeepCopying <NSObject>
+-(id) mutableDeepCopy;
 @end
+
+@interface NSDictionary (MutableDeepCopy) <MutableDeepCopying>
+@end
+
+@interface NSArray (MutableDeepCopy) <MutableDeepCopying>
+@end
+

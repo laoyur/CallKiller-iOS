@@ -6,6 +6,7 @@
 #endif
 
 #import <UIKit/UIKit.h>
+#import <notify.h>
 
 #import "TUCall.h"
 #import "TUCallCenter.h"
@@ -16,10 +17,14 @@
 #import "TUHandle.h"
 
 #import "statics.h"
+#import "Preference.h"
+
 #define SQLITE_OPEN_READONLY 0x00000001
+#define kCallDbPath @"/var/mobile/Library/CallDirectory/CallDirectory.db"
 
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
+static NSDictionary *pref = nil;
 
 static void Log(const char *fmt, ...) {
     static NSDateFormatter *dateFormatter = nil;
@@ -51,19 +56,51 @@ static BOOL isCallInBlackList(TUCall *call) {
    
     
     
-    
-    if (call.contactIdentifier)
-        return NO;
-    
-    
-    if (!db)
+    if (call.contactIdentifier && [pref[kKeyBypassContacts] boolValue])
         return NO;
     
     NSString *phonenumber = call.handle.value;
+    
+    if (phonenumber.length == 0 && [pref[kKeyBlockUnknown] boolValue]) {
+        
+        return YES;
+    }
+    
     if ([phonenumber hasPrefix:@"+86"]) {
         
         phonenumber = [phonenumber substringFromIndex:3];
     }
+    
+    if ([phonenumber hasPrefix:@"0"]) {
+        
+        for (NSString *phonePrefix in pref[kKeyBlockedCitiesFlattened]) {
+            if ([phonenumber hasPrefix:phonePrefix]) {
+                return YES;
+            }
+        }
+    }
+
+    
+    NSArray *blacklist = pref[kKeyBlacklist];
+    for (NSArray *item in blacklist) {
+        NSString *pattern = item[1];    
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
+        if (regex && [regex firstMatchInString:phonenumber options:0 range: NSMakeRange(0, [phonenumber length])]) {
+            return YES;
+        }
+    }
+    
+    if (!db) {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
+            db = [FMDatabase databaseWithPath:kCallDbPath];
+            db.crashOnErrors = NO;
+            db.logsErrors = NO;
+            [db openWithFlags:SQLITE_OPEN_READONLY];    
+        } else {
+            return NO;
+        }
+    }
+   
     
     NSString *number2Query = nil;
     if (phonenumber.length == 11 && 
@@ -94,24 +131,19 @@ static BOOL isCallInBlackList(TUCall *call) {
     FMResultSet *rs = [db executeQuery:@"select localized_label from\
                        (select * from\
                         (select id from PhoneNumber where number = ?) as A\
-                        left join PhoneNumberIdentificationEntry  as B on A.id = B.phone_number_id) as C\
+                        left join PhoneNumberIdentificationEntry as B on A.id = B.phone_number_id) as C\
                        left join Label as L where L.id = C.label_id", number2Query];
     if ([rs next]) {
         label = [rs stringForColumnIndex:0];
     }
     [rs close];
-    Log("==== label found: %@", label);   
+    Log("==== label found in db: %@", label);   
     
-    if ([label containsString:@"推销"] ||
-        [label containsString:@"广告"] ||
-        [label containsString:@"房产"] ||
-        [label containsString:@"中介"] ||
-        [label containsString:@"骚扰"] ||
-        [label containsString:@"诈骗"] ||
-        [label containsString:@"保险"] ||
-        [label containsString:@"理财"]
-        ) {
-        return YES;
+    NSArray *keywords = pref[kKeyBlackKeywords];
+    for (NSString *kwd in keywords) {
+        if ([label containsString:kwd]) {
+            return YES;
+        }
     }
     return NO;
 }
@@ -137,14 +169,18 @@ static BOOL isCallInBlackList(TUCall *call) {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class SpringBoard; @class SBTelephonyManager; 
+@class SBTelephonyManager; @class SpringBoard; 
 static void (*_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$)(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void (*_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); 
 
-#line 118 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 150 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
 
 static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, NSNotification* arg1) {
+    if (![pref[kKeyEnabled] boolValue]) {
+        _logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$(self, _cmd, arg1);
+        return;
+    }
     TUProxyCall *call = arg1.object;
-    Log("call status: %d", call.callStatus);
+
     if (pendingIncomingTUCall) {
         if (call == pendingIncomingTUCall) {
             
@@ -158,7 +194,7 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
             if (call.callStatus == 1 ||     
                 call.callStatus == 6) {     
                 pendingIncomingTUCall = nil;
-                Log("==== pendingIncomingTUCall set nil");
+
             }
         } else {
             
@@ -166,7 +202,7 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
     } else {
         if (call.isIncoming && call.callStatus == 4) {  
             
-            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@", call.handle.value, call.contactIdentifier, call.localizedLabel);
+            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
@@ -184,21 +220,28 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
 
 static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id application) {
     _logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$(self, _cmd, application);
+    
+    
     NSString *path = @"/var/mobile/callkiller.log";
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[NSData data] writeToFile:path atomically:YES];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     }
-    NSString *callDB = @"/var/mobile/Library/CallDirectory/CallDirectory.db";
-    if ([[NSFileManager defaultManager] fileExistsAtPath:callDB]) {
-        db = [FMDatabase databaseWithPath:callDB];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
+        db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    
     }
+    int token;
+    notify_register_dispatch("com.laoyur.callkiller.preference-updated", &token, dispatch_get_main_queue(), ^(int token) {
+        pref = [Preference load];
+        
+    });
+    pref = [Preference load];
 }
 
 
 
 static __attribute__((constructor)) void _logosLocalInit() {
 {Class _logos_class$_ungrouped$SBTelephonyManager = objc_getClass("SBTelephonyManager"); MSHookMessageEx(_logos_class$_ungrouped$SBTelephonyManager, @selector(callEventHandler:), (IMP)&_logos_method$_ungrouped$SBTelephonyManager$callEventHandler$, (IMP*)&_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$);Class _logos_class$_ungrouped$SpringBoard = objc_getClass("SpringBoard"); MSHookMessageEx(_logos_class$_ungrouped$SpringBoard, @selector(applicationDidFinishLaunching:), (IMP)&_logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$, (IMP*)&_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$);} }
-#line 176 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 219 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"

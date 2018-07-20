@@ -5,6 +5,7 @@
 #endif
 
 #import <UIKit/UIKit.h>
+#import <notify.h>
 
 #import "TUCall.h"
 #import "TUCallCenter.h"
@@ -15,10 +16,14 @@
 #import "TUHandle.h"
 
 #import "statics.h"
+#import "Preference.h"
+
 #define SQLITE_OPEN_READONLY 0x00000001
+#define kCallDbPath @"/var/mobile/Library/CallDirectory/CallDirectory.db"
 
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
+static NSDictionary *pref = nil;
 
 static void Log(const char *fmt, ...) {
     static NSDateFormatter *dateFormatter = nil;
@@ -48,22 +53,54 @@ static BOOL isCallInBlackList(TUCall *call) {
     if (call.isBlocked)
         return YES;
    
-    // ?? 如果有联系人ID，认为不应该拦截
     // 联系人数据库位置
     // /var/mobile/Library/AddressBook/AddressBook.sqlitedb -- ABPersonFullTextSearch_content -- c16Phone
-    if (call.contactIdentifier)
-        return NO;
-    
-    // CallDirectory.db不存在？？
-    if (!db)
+    if (call.contactIdentifier && [pref[kKeyBypassContacts] boolValue])
         return NO;
     
     NSString *phonenumber = call.handle.value;
+    
+    if (phonenumber.length == 0 && [pref[kKeyBlockUnknown] boolValue]) {
+        // 未知号码 ？
+        return YES;
+    }
+    
     if ([phonenumber hasPrefix:@"+86"]) {
         // 去掉+86
         phonenumber = [phonenumber substringFromIndex:3];
     }
     
+    if ([phonenumber hasPrefix:@"0"]) {
+        // 按区号拦截规则
+        for (NSString *phonePrefix in pref[kKeyBlockedCitiesFlattened]) {
+            if ([phonenumber hasPrefix:phonePrefix]) {
+                return YES;
+            }
+        }
+    }
+
+    // 黑名单拦截
+    NSArray *blacklist = pref[kKeyBlacklist];
+    for (NSArray *item in blacklist) {
+        NSString *pattern = item[1];    // 0 - user_input; 1 - pattern; 2 - comment
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
+        if (regex && [regex firstMatchInString:phonenumber options:0 range: NSMakeRange(0, [phonenumber length])]) {
+            return YES;
+        }
+    }
+    
+    if (!db) {
+        if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
+            db = [FMDatabase databaseWithPath:kCallDbPath];
+            db.crashOnErrors = NO;
+            db.logsErrors = NO;
+            [db openWithFlags:SQLITE_OPEN_READONLY];    // 只读方式打开
+        } else {
+            return NO;
+        }
+    }
+   
+    // 关键字拦截
     NSString *number2Query = nil;
     if (phonenumber.length == 11 && 
         ([phonenumber hasPrefix:@"13"] ||
@@ -93,32 +130,31 @@ static BOOL isCallInBlackList(TUCall *call) {
     FMResultSet *rs = [db executeQuery:@"select localized_label from\
                        (select * from\
                         (select id from PhoneNumber where number = ?) as A\
-                        left join PhoneNumberIdentificationEntry  as B on A.id = B.phone_number_id) as C\
+                        left join PhoneNumberIdentificationEntry as B on A.id = B.phone_number_id) as C\
                        left join Label as L where L.id = C.label_id", number2Query];
     if ([rs next]) {
         label = [rs stringForColumnIndex:0];
     }
     [rs close];
-    Log("==== label found: %@", label);   // label可能是nil
+    Log("==== label found in db: %@", label);   // label可能是nil
     
-    if ([label containsString:@"推销"] ||
-        [label containsString:@"广告"] ||
-        [label containsString:@"房产"] ||
-        [label containsString:@"中介"] ||
-        [label containsString:@"骚扰"] ||
-        [label containsString:@"诈骗"] ||
-        [label containsString:@"保险"] ||
-        [label containsString:@"理财"]
-        ) {
-        return YES;
+    NSArray *keywords = pref[kKeyBlackKeywords];
+    for (NSString *kwd in keywords) {
+        if ([label containsString:kwd]) {
+            return YES;
+        }
     }
     return NO;
 }
 
 %hook SBTelephonyManager
 -(void)callEventHandler:(NSNotification*)arg1 {
+    if (![pref[kKeyEnabled] boolValue]) {
+        %orig;
+        return;
+    }
     TUProxyCall *call = arg1.object;
-    Log("call status: %d", call.callStatus);
+//    Log("call status: %d", call.callStatus);
     if (pendingIncomingTUCall) {
         if (call == pendingIncomingTUCall) {
             /**
@@ -132,7 +168,7 @@ static BOOL isCallInBlackList(TUCall *call) {
             if (call.callStatus == 1 ||     // 接通
                 call.callStatus == 6) {     // 挂断
                 pendingIncomingTUCall = nil;
-                Log("==== pendingIncomingTUCall set nil");
+//                Log("==== pendingIncomingTUCall set nil");
             }
         } else {
             // 过程中来了第二通电话，不管它
@@ -140,7 +176,7 @@ static BOOL isCallInBlackList(TUCall *call) {
     } else {
         if (call.isIncoming && call.callStatus == 4) {  // 4 ringing
             // new incoming call
-            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@", call.handle.value, call.contactIdentifier, call.localizedLabel);
+            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
@@ -158,17 +194,24 @@ static BOOL isCallInBlackList(TUCall *call) {
 
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
+    
+    // remove the log file created in 1.0.0
     NSString *path = @"/var/mobile/callkiller.log";
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[NSData data] writeToFile:path atomically:YES];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
     }
-    NSString *callDB = @"/var/mobile/Library/CallDirectory/CallDirectory.db";
-    if ([[NSFileManager defaultManager] fileExistsAtPath:callDB]) {
-        db = [FMDatabase databaseWithPath:callDB];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
+        db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    // 只读方式打开
     }
+    int token;
+    notify_register_dispatch("com.laoyur.callkiller.preference-updated", &token, dispatch_get_main_queue(), ^(int token) {
+        pref = [Preference load];
+        // Log("== pref updated: %@", pref);
+    });
+    pref = [Preference load];
 }
 
 %end
