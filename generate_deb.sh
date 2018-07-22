@@ -81,8 +81,9 @@ Icon: file:///Applications/callkiller-gui.app/AppIcon60x60@2x.png
 EOF
 
 cat > dpkg-tmp/DEBIAN/postinst << EOF
-killall -9 SpringBoard
-su -c uicache mobile
+#!/bin/sh
+uicache
+exit 0
 EOF
 
 chmod a+x dpkg-tmp/DEBIAN/postinst

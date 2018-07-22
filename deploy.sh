@@ -8,4 +8,6 @@ VERSION=`/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' callkill
 scp callkiller-${VERSION}.deb root@$DEVICE_IP:/tmp/callkiller.deb
 ssh root@$DEVICE_IP <<-'ENDSSH'
     dpkg -i /tmp/callkiller.deb
+    sleep 2
+    killall -9 SpringBoard
 ENDSSH
