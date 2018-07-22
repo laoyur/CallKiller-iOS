@@ -40,6 +40,13 @@
     }
 }
 
+-(void)saveOnly {
+    NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:nil];
+    if (data) {
+        [data writeToFile:kCallKillerPreferenceFilePath atomically:YES];
+    }
+}
+
 +(NSDictionary*)load {
     NSData *data = [NSData dataWithContentsOfFile:kCallKillerPreferenceFilePath];
     if (data) {

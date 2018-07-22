@@ -112,6 +112,31 @@
 
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSMutableArray *actions = [NSMutableArray new];
+    
+    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"备注" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        NSMutableDictionary *pref = [[Preference sharedInstance] pref];
+        NSMutableArray *blacklist = pref[kKeyBlacklist];
+        NSMutableArray *item = [blacklist[indexPath.row] mutableCopy];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"修改备注" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.text = item[2];
+        }];
+        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            item[2] = [alert.textFields[0].text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            blacklist[indexPath.row] = item;
+            [[Preference sharedInstance] saveOnly]; // 无需通知SpringBoard
+            [self.tableview reloadData];
+        }]];
+        [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        [tableView setEditing:NO animated:NO];
+        
+        if (blacklist.count == 0) {
+            self.trashButton.enabled = NO;
+        }
+    }]];
+    
     [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *blacklist = pref[kKeyBlacklist];

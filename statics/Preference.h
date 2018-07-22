@@ -25,5 +25,6 @@
 
 -(NSMutableDictionary*)pref;
 -(void)save;
+-(void)saveOnly;
 
 @end
