@@ -23,6 +23,7 @@
 
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
+static BOOL pendingIncomingTUCallBlocked = NO;
 static NSDictionary *pref = nil;
 
 static void Log(const char *fmt, ...) {
@@ -154,33 +155,50 @@ static BOOL isCallInBlackList(TUCall *call) {
         return;
     }
     TUProxyCall *call = arg1.object;
-//    Log("call status: %d", call.callStatus);
     if (pendingIncomingTUCall) {
         if (call == pendingIncomingTUCall) {
             /**
-             call.callStatus:
+             call.status:
              1 - call established
              3 - outgoing connecting
              4 - incoming ringing
+             5 - disconnecting
              6 - disconnected
              // 以上是我根据调试结果推断的
              */
-            if (call.callStatus == 1 ||     // 接通
-                call.callStatus == 6) {     // 挂断
+            if (call.status == 1) {
+                // 用户手动接通
                 pendingIncomingTUCall = nil;
-//                Log("==== pendingIncomingTUCall set nil");
+                pendingIncomingTUCallBlocked = NO;  // just in case
+            } else if (call.status == 6) { 
+                // 电话被挂断
+                pendingIncomingTUCall = nil;
+                if (pendingIncomingTUCallBlocked) {
+                    pendingIncomingTUCallBlocked = NO;
+                    return; // 不调用 %orig
+                } else {
+                    pendingIncomingTUCallBlocked = NO;
+                }
+            } else {
+                // 其他状态
+                if (pendingIncomingTUCallBlocked) {
+                    return; // 不调用 %orig，防止出现通话界面闪一下的情况
+                }
             }
         } else {
             // 过程中来了第二通电话，不管它
         }
     } else {
-        if (call.isIncoming && call.callStatus == 4) {  // 4 ringing
+        if (call.isIncoming && call.status == 4) {  // 4 ringing
             // new incoming call
             Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
                 Log("==== call blocked");
+                pendingIncomingTUCallBlocked = YES;
+                
+                // it will trigger callEventHandler immediatelly with call.status == 5
                 [[TUCallCenter sharedInstance] disconnectCall:call];
                 return; // 不调用 %orig，防止出现通话界面闪一下的情况
             }
@@ -195,11 +213,6 @@ static BOOL isCallInBlackList(TUCall *call) {
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
     
-    // remove the log file created in 1.0.0
-    NSString *path = @"/var/mobile/callkiller.log";
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    }
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;

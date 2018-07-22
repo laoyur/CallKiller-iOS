@@ -24,6 +24,7 @@
 
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
+static BOOL pendingIncomingTUCallBlocked = NO;
 static NSDictionary *pref = nil;
 
 static void Log(const char *fmt, ...) {
@@ -172,7 +173,7 @@ static BOOL isCallInBlackList(TUCall *call) {
 @class SBTelephonyManager; @class SpringBoard; 
 static void (*_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$)(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void (*_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); 
 
-#line 150 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 151 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
 
 static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, NSNotification* arg1) {
     if (![pref[kKeyEnabled] boolValue]) {
@@ -180,7 +181,6 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
         return;
     }
     TUProxyCall *call = arg1.object;
-
     if (pendingIncomingTUCall) {
         if (call == pendingIncomingTUCall) {
             
@@ -191,22 +191,40 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
 
 
 
-            if (call.callStatus == 1 ||     
-                call.callStatus == 6) {     
-                pendingIncomingTUCall = nil;
 
+            if (call.status == 1) {
+                
+                pendingIncomingTUCall = nil;
+                pendingIncomingTUCallBlocked = NO;  
+            } else if (call.status == 6) { 
+                
+                pendingIncomingTUCall = nil;
+                if (pendingIncomingTUCallBlocked) {
+                    pendingIncomingTUCallBlocked = NO;
+                    return; 
+                } else {
+                    pendingIncomingTUCallBlocked = NO;
+                }
+            } else {
+                
+                if (pendingIncomingTUCallBlocked) {
+                    return; 
+                }
             }
         } else {
             
         }
     } else {
-        if (call.isIncoming && call.callStatus == 4) {  
+        if (call.isIncoming && call.status == 4) {  
             
             Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
                 Log("==== call blocked");
+                pendingIncomingTUCallBlocked = YES;
+                
+                
                 [[TUCallCenter sharedInstance] disconnectCall:call];
                 return; 
             }
@@ -221,11 +239,6 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
 static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id application) {
     _logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$(self, _cmd, application);
     
-    
-    NSString *path = @"/var/mobile/callkiller.log";
-    if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
-    }
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
@@ -244,4 +257,4 @@ static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(
 
 static __attribute__((constructor)) void _logosLocalInit() {
 {Class _logos_class$_ungrouped$SBTelephonyManager = objc_getClass("SBTelephonyManager"); MSHookMessageEx(_logos_class$_ungrouped$SBTelephonyManager, @selector(callEventHandler:), (IMP)&_logos_method$_ungrouped$SBTelephonyManager$callEventHandler$, (IMP*)&_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$);Class _logos_class$_ungrouped$SpringBoard = objc_getClass("SpringBoard"); MSHookMessageEx(_logos_class$_ungrouped$SpringBoard, @selector(applicationDidFinishLaunching:), (IMP)&_logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$, (IMP*)&_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$);} }
-#line 219 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 232 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
