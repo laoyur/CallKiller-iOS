@@ -29,6 +29,7 @@
 		0495EB0120FC2B18006C6720 /* FMDatabaseQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 0495EAF020FC2B18006C6720 /* FMDatabaseQueue.m */; };
 		0495EB0220FC2B18006C6720 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 0495EAF320FC2B18006C6720 /* FMResultSet.m */; };
 		0495EB0420FC3AD3006C6720 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0495EB0320FC3AD3006C6720 /* libsqlite3.tbd */; };
+		0497479F2104891F0006CB85 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 049747A12104891F0006CB85 /* Localizable.strings */; };
 		0498F46B21004B0000A6A041 /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = 0498F46A21004B0000A6A041 /* cities.json */; };
 		0498F46E2100868000A6A041 /* BlacklistVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 0498F46D2100868000A6A041 /* BlacklistVC.m */; };
 		0498F4712100869200A6A041 /* KeywordsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 0498F4702100869200A6A041 /* KeywordsVC.m */; };
@@ -129,6 +130,10 @@
 		0495EAF420FC2B18006C6720 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0495EB0320FC3AD3006C6720 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		0495EB0520FCAE87006C6720 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0497479A210480960006CB85 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		0497479C210480C10006CB85 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		049747A02104891F0006CB85 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		049747A2210489210006CB85 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		0498F46A21004B0000A6A041 /* cities.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = cities.json; sourceTree = "<group>"; };
 		0498F46C2100868000A6A041 /* BlacklistVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlacklistVC.h; sourceTree = "<group>"; };
 		0498F46D2100868000A6A041 /* BlacklistVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlacklistVC.m; sourceTree = "<group>"; };
@@ -391,6 +396,7 @@
 				0498F4702100869200A6A041 /* KeywordsVC.m */,
 				0498F4722100B21B00A6A041 /* AlertUtil.h */,
 				0498F4732100B21B00A6A041 /* AlertUtil.m */,
+				049747A12104891F0006CB85 /* Localizable.strings */,
 			);
 			path = "callkiller-gui";
 			sourceTree = "<group>";
@@ -492,6 +498,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 04957CEB20F621DD003F6E0B;
 			productRefGroup = 04957CF720F621DD003F6E0B /* Products */;
@@ -510,6 +517,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0497479F2104891F0006CB85 /* Localizable.strings in Resources */,
 				0498F46B21004B0000A6A041 /* cities.json in Resources */,
 				04D3A6FA20FF654F00D1CC16 /* LaunchScreen.storyboard in Resources */,
 				04D3A6F720FF654F00D1CC16 /* Assets.xcassets in Resources */,
@@ -611,10 +619,21 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		049747A12104891F0006CB85 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				049747A02104891F0006CB85 /* en */,
+				049747A2210489210006CB85 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
 		04D3A6F320FF654F00D1CC16 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
 				04D3A6F420FF654F00D1CC16 /* Base */,
+				0497479A210480960006CB85 /* zh-Hans */,
+				0497479C210480C10006CB85 /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -633,6 +652,7 @@
 		04957D0C20F621DD003F6E0B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";
@@ -659,6 +679,7 @@
 		04957D0D20F621DD003F6E0B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";

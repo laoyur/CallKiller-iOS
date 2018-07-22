@@ -35,7 +35,8 @@
     self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     
     NSMutableDictionary *pref = [[Preference sharedInstance] pref];
-    self.statusLabel.text = [pref[kKeyEnabled] boolValue] ? @"已启用" : @"未启用";
+
+    self.statusLabel.text = [pref[kKeyEnabled] boolValue] ? NSLocalizedString(@"enabled", nil) : NSLocalizedString(@"disabled", nil);
     [self.enableSwitch setOn:[pref[kKeyEnabled] boolValue] animated:NO];
     [self.blockingUnknownSwitch setOn:[pref[kKeyBlockUnknown] boolValue] animated:NO];
     [self.contactBypassSwitch setOn:[pref[kKeyBypassContacts] boolValue] animated:NO];
@@ -46,23 +47,23 @@
     NSDictionary *pref = [[Preference sharedInstance] pref];
     NSArray *citiesBlocked = pref[kKeyBlockedCitiesFlattened];
     if (citiesBlocked.count > 0) {
-        self.citiesBlockedCount.text = [NSString stringWithFormat:@"%ld 个城市", citiesBlocked.count];
+        self.citiesBlockedCount.text = [NSString stringWithFormat:NSLocalizedString(@"city-block-count-fmt", nil), citiesBlocked.count];
     } else {
-        self.citiesBlockedCount.text = @"未配置";
+        self.citiesBlockedCount.text = NSLocalizedString(@"no-config", nil);
     }
     
     NSArray *blacklist = pref[kKeyBlacklist];
     if (blacklist.count > 0) {
-        self.blackListCountLabel.text = [NSString stringWithFormat:@"%ld 条记录", blacklist.count];
+        self.blackListCountLabel.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), blacklist.count];
     } else {
-        self.blackListCountLabel.text = @"未配置";
+        self.blackListCountLabel.text = NSLocalizedString(@"no-config", nil);
     }
     
     NSArray *keywords = pref[kKeyBlackKeywords];
     if (keywords.count > 0) {
-        self.blackKeywordsCount.text = [NSString stringWithFormat:@"%ld 条记录", keywords.count];
+        self.blackKeywordsCount.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), keywords.count];
     } else {
-        self.blackKeywordsCount.text = @"未配置";
+        self.blackKeywordsCount.text = NSLocalizedString(@"no-config", nil);
     }
 }
 
@@ -74,7 +75,7 @@
     if (sender == self.enableSwitch) {
         [[Preference sharedInstance] pref][kKeyEnabled] = @(self.enableSwitch.isOn);
         [[Preference sharedInstance] save];
-        self.statusLabel.text = self.enableSwitch.isOn ? @"已启用" : @"未启用";
+        self.statusLabel.text = self.enableSwitch.isOn ? NSLocalizedString(@"enabled", nil) : NSLocalizedString(@"disabled", nil);
     } else if (sender == self.blockingUnknownSwitch) {
         [[Preference sharedInstance] pref][kKeyBlockUnknown] = @(self.blockingUnknownSwitch.isOn);
         [[Preference sharedInstance] save];
@@ -127,10 +128,10 @@
                     [content appendFormat:@"%@（%@）￥%.2f\n", donation[@"name"], [displayFormat stringFromDate:[ios8601 dateFromString:donation[@"created_at"]]], [donation[@"amount"] floatValue]];
                 }
             } else {
-                [content appendString:@"尚未有人捐赠"];
+                [content appendString:NSLocalizedString(@"no-donation", nil)];
             }
 
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"捐赠名单" message:content preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"donation-list", nil) message:content preferredStyle:UIAlertControllerStyleAlert];
             
             // message居左
             if (list && list.count) {
@@ -140,10 +141,10 @@
                 [alert setValue:msgAS forKey:@"attributedMessage"];
             }
             
-            [alert addAction:[UIAlertAction actionWithTitle:@"支付宝捐赠" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"donate-alipay", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
                 [self donate];
             }]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
                 
             }]];
             [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alert animated:YES completion:^{
@@ -152,7 +153,7 @@
             
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             [AlertUtil hideWaitingHud];
-            [AlertUtil showInfo:@"出错了" message:@"服务器无响应"];
+            [AlertUtil showInfo:NSLocalizedString(@"error-title", nil) message:NSLocalizedString(@"error-content", nil)];
         }];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.donation"]) {
         [self donate];
@@ -164,8 +165,8 @@
     [UIPasteboard generalPasteboard].string = kDonationAlipayAccount;
     NSURL *alipayURL = [NSURL URLWithString:@"alipay://"];
     BOOL alipayInstalled = [[UIApplication sharedApplication] canOpenURL:alipayURL];
-    NSString *message = [NSString stringWithFormat:@"感谢您的支持！\n%@", alipayInstalled ? @"即将跳转到支付宝，请在转账备注中留下您的昵称，以便显示在「捐赠名单」中。" : @""];
-    [AlertUtil showInfo:@"支付宝账号已拷贝" message:message onConfirm:^{
+    NSString *message = [NSString stringWithFormat:NSLocalizedString(@"donate-alert-title-1", nil), alipayInstalled ? NSLocalizedString(@"donate-alert-title-2", nil) : @""];
+    [AlertUtil showInfo:NSLocalizedString(@"donate-alipay-copied", nil) message:message onConfirm:^{
         [[UIApplication sharedApplication] openURL:alipayURL options:@{} completionHandler:^(BOOL success) {
             
         }];

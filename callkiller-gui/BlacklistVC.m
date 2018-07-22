@@ -30,7 +30,7 @@
     // Dispose of any resources that can be recreated.
 }
 - (IBAction)onTrash:(id)sender {
-    [AlertUtil showQuery:@"确定清空黑名单？" message:nil isDanger:YES onConfirm:^{
+    [AlertUtil showQuery:NSLocalizedString(@"del-all-blacklist-prompt", nil) message:nil isDanger:YES onConfirm:^{
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *blacklist = pref[kKeyBlacklist];
         [blacklist removeAllObjects];
@@ -40,22 +40,22 @@
     }];
 }
 - (IBAction)onAdd:(id)sender {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"增加黑名单" message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"add-blacklist", nil) message:nil preferredStyle:UIAlertControllerStyleAlert];
     
     NSMutableParagraphStyle * messagePS = [NSMutableParagraphStyle new];
     messagePS.alignment = NSTextAlignmentLeft;
-    NSMutableAttributedString *msgAS = [[NSMutableAttributedString alloc] initWithString:@"支持通配符（?、*）\n? 代表单个数字，\n* 代表0个或任意个数字。\n\n示例1：指定号码，10086\n示例2：指定号段，05128286*\n示例3：固定位数，1381234????\n\n请勿添加86前缀" attributes:@{NSParagraphStyleAttributeName:messagePS, NSFontAttributeName:[UIFont systemFontOfSize:14]}];
+    NSMutableAttributedString *msgAS = [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"blacklist-example", nil) attributes:@{NSParagraphStyleAttributeName:messagePS, NSFontAttributeName:[UIFont systemFontOfSize:14]}];
     [alert setValue:msgAS forKey:@"attributedMessage"];
     
-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
-    UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    UIAlertAction *confirm = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         NSString *number = alert.textFields[0].text;
         if (number.length) {
             number = [number stringByReplacingOccurrencesOfString:@"**" withString:@"*"];
             number = [number stringByReplacingOccurrencesOfString:@"*?" withString:@"*"];
             number = [number stringByReplacingOccurrencesOfString:@"?*" withString:@"*"];
             if ([number containsString:@"**"] || [number containsString:@"*?"] ||[number containsString:@"?*"]) {
-                [AlertUtil showInfo:@"不支持的格式！" message:nil];
+                [AlertUtil showInfo:NSLocalizedString(@"format-not-supported", nil) message:nil];
                 return;
             }
             NSString *pattern = [number stringByReplacingOccurrencesOfString:@"*" withString:@"\\d*"];
@@ -70,7 +70,7 @@
             }
             for (NSArray *item in blacklist) {
                 if ([item[0] isEqualToString:number]) {
-                    [AlertUtil showInfo:@"已经存在，请勿重复添加！" message:nil];
+                    [AlertUtil showInfo:NSLocalizedString(@"duplicated-entry", nil) message:nil];
                     return;
                 }
             }
@@ -83,12 +83,12 @@
     self.alertAction = confirm;
     [alert addAction:confirm];
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.placeholder = @"请输入号码";
+        textField.placeholder = NSLocalizedString(@"enter-number", nil);
         textField.keyboardType = UIKeyboardTypeASCIICapable;
         textField.delegate = self;
     }];
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.placeholder = @"备注（可选）";
+        textField.placeholder = NSLocalizedString(@"comment-optional", nil);
     }];
     [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alert animated:YES completion:^{
         //
@@ -113,17 +113,17 @@
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSMutableArray *actions = [NSMutableArray new];
     
-    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"备注" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"comment", nil) handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *blacklist = pref[kKeyBlacklist];
         NSMutableArray *item = [blacklist[indexPath.row] mutableCopy];
         
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"修改备注" message:nil preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"edit-comment", nil) message:nil preferredStyle:UIAlertControllerStyleAlert];
         [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
             textField.text = item[2];
         }];
-        [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             item[2] = [alert.textFields[0].text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             blacklist[indexPath.row] = item;
             [[Preference sharedInstance] saveOnly]; // 无需通知SpringBoard
@@ -137,7 +137,7 @@
         }
     }]];
     
-    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:NSLocalizedString(@"delete", nil) handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *blacklist = pref[kKeyBlacklist];
         [blacklist removeObjectAtIndex:indexPath.row];

@@ -30,7 +30,7 @@
     // Dispose of any resources that can be recreated.
 }
 - (IBAction)onTrash:(id)sender {
-    [AlertUtil showQuery:@"确定清空拦截关键词？" message:nil isDanger:YES onConfirm:^{
+    [AlertUtil showQuery:NSLocalizedString(@"del-all-keywords-prompt", nil) message:nil isDanger:YES onConfirm:^{
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *keywords = pref[kKeyBlackKeywords];
         [keywords removeAllObjects];
@@ -40,9 +40,9 @@
     }];
 }
 - (IBAction)onAdd:(id)sender {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"增加关键词" message:@"不支持通配符" preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
-    UIAlertAction *confirm = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"add-keyword-title", nil) message:NSLocalizedString(@"add-keyword-content", nil) preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    UIAlertAction *confirm = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         NSString *keyword = [alert.textFields[0].text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         if (keyword.length) {
             NSMutableDictionary *pref = [[Preference sharedInstance] pref];
@@ -53,7 +53,7 @@
             }
             for (NSString *item in keywords) {
                 if ([item isEqualToString:keyword]) {
-                    [AlertUtil showInfo:@"已经存在，请勿重复添加！" message:nil];
+                    [AlertUtil showInfo:NSLocalizedString(@"duplicated-entry", nil) message:nil];
                     return;
                 }
             }
@@ -66,7 +66,7 @@
     self.alertAction = confirm;
     [alert addAction:confirm];
     [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
-        textField.placeholder = @"请输入关键词";
+        textField.placeholder = NSLocalizedString(@"enter-keyword-prompt", nil);
         textField.delegate = self;
     }];
     [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alert animated:YES completion:^{
@@ -90,7 +90,7 @@
 
 - (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSMutableArray *actions = [NSMutableArray new];
-    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"删除" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    [actions addObject:[UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:NSLocalizedString(@"delete", nil) handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSMutableArray *keywords = pref[kKeyBlackKeywords];
         [keywords removeObjectAtIndex:indexPath.row];

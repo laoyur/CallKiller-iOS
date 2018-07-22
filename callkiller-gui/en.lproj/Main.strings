@@ -1,0 +1,75 @@
+
+/* Class = "UILabel"; text = "全部拦截"; ObjectID = "0Yn-ZW-7iL"; */
+"0Yn-ZW-7iL.text" = "Block All";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "0v5-UI-jnG"; */
+"0v5-UI-jnG.text" = "Title";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "2Gx-NC-qzY"; */
+"2Gx-NC-qzY.text" = "Label";
+
+/* Class = "UINavigationItem"; title = "号码黑名单"; ObjectID = "3np-Tm-w3F"; */
+"3np-Tm-w3F.title" = "Blacklist";
+
+/* Class = "UILabel"; text = "按区号拦截"; ObjectID = "4fu-3x-1WL"; */
+"4fu-3x-1WL.text" = "Block by region (China mainland)";
+
+/* Class = "UILabel"; text = "版本号"; ObjectID = "Aby-nN-l5F"; */
+"Aby-nN-l5F.text" = "Version";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Boe-Kq-JvX"; */
+"Boe-Kq-JvX.text" = "Label";
+
+/* Class = "UITableViewSection"; footerTitle = "* 关键词拦截功能，需要你自行安装“防骚扰大师”之类的App。CallKiller将对此类软件的识别结果进行关键词匹配。"; ObjectID = "ENJ-Ja-TcT"; */
+"ENJ-Ja-TcT.footerTitle" = "* You need to install CallKit based apps manually to generate number-label database. CallKiller is developed by individual, and the developer simply has no resource to maintain such a database.";
+
+/* Class = "UINavigationItem"; title = "CallKiller"; ObjectID = "I1h-UH-vWR"; */
+"I1h-UH-vWR.title" = "CallKiller";
+
+/* Class = "UILabel"; text = "拦截「未知号码」"; ObjectID = "KOI-i6-3HF"; */
+"KOI-i6-3HF.text" = "Block「Unknown Number」";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "NV7-yY-f4m"; */
+"NV7-yY-f4m.text" = "Label";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "OuF-I6-aFg"; */
+"OuF-I6-aFg.text" = "Title";
+
+/* Class = "UILabel"; text = "built with ♥ by laoyur"; ObjectID = "Q0p-kf-64s"; */
+"Q0p-kf-64s.text" = "built with ♥ by laoyur";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Qod-Kr-Alc"; */
+"Qod-Kr-Alc.text" = "Label";
+
+/* Class = "UILabel"; text = "放行联系人"; ObjectID = "Ttl-2b-vDT"; */
+"Ttl-2b-vDT.text" = "Bypass address-book numbers";
+
+/* Class = "UILabel"; text = "无锡市"; ObjectID = "USm-tZ-hSQ"; */
+"USm-tZ-hSQ.text" = "Wuxi";
+
+/* Class = "UILabel"; text = "支付宝捐赠"; ObjectID = "Wh0-qr-11W"; */
+"Wh0-qr-11W.text" = "Donate with Alipay";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "d9d-ZO-bln"; */
+"d9d-ZO-bln.text" = "Detail";
+
+/* Class = "UILabel"; text = "捐赠名单"; ObjectID = "fJI-NP-7UX"; */
+"fJI-NP-7UX.text" = "Donation list";
+
+/* Class = "UIBarButtonItem"; title = "退出"; ObjectID = "fTK-Zy-mgO"; */
+"fTK-Zy-mgO.title" = "Exit";
+
+/* Class = "UINavigationItem"; title = "拦截关键词"; ObjectID = "mFb-xq-vUc"; */
+"mFb-xq-vUc.title" = "Keywords";
+
+/* Class = "UILabel"; text = "拦截关键词 *"; ObjectID = "nQf-Z5-fYM"; */
+"nQf-Z5-fYM.text" = "Block by keywords *";
+
+/* Class = "UILabel"; text = "号码黑名单"; ObjectID = "rt1-i0-rUv"; */
+"rt1-i0-rUv.text" = "Number blacklist";
+
+/* Class = "UILabel"; text = "启用"; ObjectID = "yH8-rm-lmu"; */
+"yH8-rm-lmu.text" = "Enabled";
+
+/* Class = "UINavigationItem"; title = "按区号拦截"; ObjectID = "zOF-mO-cI1"; */
+"zOF-mO-cI1.title" = "Block by region";

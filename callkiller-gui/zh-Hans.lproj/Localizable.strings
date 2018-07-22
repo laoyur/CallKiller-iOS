@@ -1,0 +1,33 @@
+
+"enabled" = "已启用";
+"disabled" = "未启用";
+"city-block-count-fmt" = "%ld 个城市";
+"record-count-fmt" = "%ld 条记录";
+"no-config" = "未配置";
+"no-donation" = "尚无捐赠";
+"donation-list" = "捐赠名单";
+"donate-alipay" = "支付宝捐赠";
+"error-title" = "出错了";
+"error-content" = "服务器无响应，或网络错误";
+"donate-alert-title-1" = "感谢您的支持！\n%@";
+"donate-alert-title-2" = "即将跳转到支付宝，请在转账附言中留下您的昵称，以便显示在「捐赠名单」中。";
+"donate-alipay-copied" = "支付宝账号已拷贝";
+
+"ok" = "确定";
+"cancel" = "取消";
+"delete" = "删除";
+
+"edit-comment" = "修改备注";
+"comment" = "备注";
+"comment-optional" = "备注 (选填)";
+"enter-number" = "输入号码";
+"duplicated-entry" = "重复条目，无法添加！";
+"format-not-supported" = "不支持的格式！";
+"blacklist-example" = "支持通配符（?、*）\n? 代表单个数字，\n* 代表0个或任意个数字。\n\n示例1：指定号码，10086\n示例2：指定号段，05128286*\n示例3：固定位数，1381234????\n\n请勿添加86前缀";
+"add-blacklist" = "增加黑名单";
+"del-all-blacklist-prompt" = "确定清空黑名单？";
+
+"enter-keyword-prompt" = "输入关键词";
+"add-keyword-title" = "增加关键词";
+"add-keyword-content" = "不支持通配符";
+"del-all-keywords-prompt" = "确定清空关键词？";

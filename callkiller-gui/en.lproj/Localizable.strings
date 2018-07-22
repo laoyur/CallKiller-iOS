@@ -1,0 +1,33 @@
+
+"enabled" = "Enabled";
+"disabled" = "Disabled";
+"city-block-count-fmt" = "%ld cities";
+"record-count-fmt" = "%ld records";
+"no-config" = "no items";
+"no-donation" = "No donations";
+"donation-list" = "Donation list";
+"donate-alipay" = "Donate with Alipay";
+"error-title" = "Error";
+"error-content" = "Server or network error";
+"donate-alert-title-1" = "Thanks for your support!\n%@";
+"donate-alert-title-2" = "Navigating to Alipay, please leave your nickname in transfer note. I will add your nickname in donation list.";
+"donate-alipay-copied" = "Alipay account has been copied to your pastedboard.";
+
+"ok" = "Ok";
+"cancel" = "Cancel";
+"delete" = "Delete";
+
+"edit-comment" = "Edit comment";
+"comment" = "Comment";
+"comment-optional" = "Comment (optional)";
+"enter-number" = "Enter number";
+"duplicated-entry" = "Duplicated!";
+"format-not-supported" = "Unsupported format!";
+"blacklist-example" = "Wildcard is supported(? and *) \n? is for a single digit,\n* is for 0, 1 or multiple digits.\n\neg1: specific number, 10086\neg2: specific prefix, 05128286*\neg3: fixed length, 1381234????\n\nDo NOT add country prefix.";
+"add-blacklist" = "Add blacklist";
+"del-all-blacklist-prompt" = "Sure to delete all blacklist?";
+
+"enter-keyword-prompt" = "Enter keyword";
+"add-keyword-title" = "Add keyword";
+"add-keyword-content" = "Wildcard is NOT supported";
+"del-all-keywords-prompt" = "Sure to delete all keywords?";
