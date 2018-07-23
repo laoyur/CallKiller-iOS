@@ -86,7 +86,14 @@ uicache
 exit 0
 EOF
 
+cat > dpkg-tmp/DEBIAN/postrm << EOF
+#!/bin/sh
+uicache
+exit 0
+EOF
+
 chmod a+x dpkg-tmp/DEBIAN/postinst
+chmod a+x dpkg-tmp/DEBIAN/postrm
 
 dpkg-deb -Z gzip --build dpkg-tmp callkiller-${VERSION}.deb
 sudo rm -fr dpkg-tmp
