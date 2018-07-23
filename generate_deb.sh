@@ -66,7 +66,7 @@ cat >> dpkg-tmp/DEBIAN/control <<EOF
 Description: kill the fvcking annoying spamming calls
 Section: System
 Pre-Depends: 
-Depends: firmware (>= 11.0), mobilesubstrate
+Depends: firmware (>= 10.0), mobilesubstrate
 Conflicts: 
 Replaces: 
 Priority: optional
