@@ -40,8 +40,9 @@ if [[ $? -ne "0" ]]; then
 fi
 
 sudo rm -fr dpkg-tmp
-mkdir dpkg-tmp
+mkdir -p dpkg-tmp/var/mobile/callkiller
 cp -r callkiller/Package/* dpkg-tmp/
+cp phone-*.dat dpkg-tmp/var/mobile/callkiller/
 rm -f dpkg-tmp/Library/.DS_Store
 rm -f dpkg-tmp/Library/.gitignore
 rm -f dpkg-tmp/Library/MobileSubstrate/.DS_Store

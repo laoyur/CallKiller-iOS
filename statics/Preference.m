@@ -10,11 +10,16 @@
 #import <notify.h>
 
 #if TARGET_OS_SIMULATOR
-#define kCallKillerPreferenceFilePath [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/callkiller-pref.json"]
+#define kCallKillerPreferenceFolder [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/callkiller"]
+#define kCallKillerPreferenceFilePathLegacy [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/callkiller-pref.json"]
+#define kCallKillerPreferenceFilePath [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/callkiller/callkiller-pref.json"]
 #else
-#define kCallKillerPreferenceFilePath @"/var/mobile/callkiller-pref.json"
+#define kCallKillerPreferenceFolder @"/var/mobile/callkiller"
+#define kCallKillerPreferenceFilePathLegacy @"/var/mobile/callkiller-pref.json"
+#define kCallKillerPreferenceFilePath @"/var/mobile/callkiller/callkiller-pref.json"
 #endif
 
+static BOOL didMigrate = NO;
 
 @implementation Preference
 
@@ -23,6 +28,10 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         instance = [[self alloc] init];
+        [[NSFileManager defaultManager] createDirectoryAtPath:kCallKillerPreferenceFolder 
+                                  withIntermediateDirectories:YES 
+                                                   attributes:nil 
+                                                        error:nil];
         instance->_pref = [[Preference load] mutableDeepCopy];
     });
     return instance;
@@ -48,6 +57,7 @@
 }
 
 +(NSDictionary*)load {
+    [Preference migrate];
     NSData *data = [NSData dataWithContentsOfFile:kCallKillerPreferenceFilePath];
     if (data) {
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -68,6 +78,20 @@
                      @"房产中介",
                      ]
              };
+}
+
+/**
+ /var/mobile/callkiller-pref.json --> /var/mobile/callkiller/callkiller-pref.json
+ */
++(void)migrate {
+    if (didMigrate) // do migrate only once for sb/app lifetime
+        return;
+    NSFileManager *mgr = [NSFileManager defaultManager];
+    if (![mgr fileExistsAtPath:kCallKillerPreferenceFilePath] && [mgr fileExistsAtPath:kCallKillerPreferenceFilePathLegacy]) {
+        [mgr createDirectoryAtPath:kCallKillerPreferenceFolder withIntermediateDirectories:YES attributes:nil error:nil];
+        [mgr moveItemAtPath:kCallKillerPreferenceFilePathLegacy toPath:kCallKillerPreferenceFilePath error:nil];
+    }
+    didMigrate = YES;
 }
 
 @end

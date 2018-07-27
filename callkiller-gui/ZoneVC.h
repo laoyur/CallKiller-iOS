@@ -7,6 +7,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ZoneVC : UIViewController<UITableViewDelegate, UITableViewDataSource>
+@interface ZoneVC : UIViewController<UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate>
+
+@property(nonatomic) BOOL forMobile;
 
 @end

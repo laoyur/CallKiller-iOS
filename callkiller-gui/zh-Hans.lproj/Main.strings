@@ -8,20 +8,26 @@
 /* Class = "UILabel"; text = "Label"; ObjectID = "2Gx-NC-qzY"; */
 "2Gx-NC-qzY.text" = "Label";
 
+/* Class = "UILabel"; text = "Label"; ObjectID = "3Jm-sp-X7X"; */
+"3Jm-sp-X7X.text" = "Label";
+
 /* Class = "UINavigationItem"; title = "号码黑名单"; ObjectID = "3np-Tm-w3F"; */
 "3np-Tm-w3F.title" = "号码黑名单";
 
-/* Class = "UILabel"; text = "按区号拦截"; ObjectID = "4fu-3x-1WL"; */
-"4fu-3x-1WL.text" = "按区号拦截(中国大陆适用)";
+/* Class = "UILabel"; text = "按区号拦截固话(中国内地)"; ObjectID = "4fu-3x-1WL"; */
+"4fu-3x-1WL.text" = "按区号拦截固话 *";
 
-/* Class = "UILabel"; text = "版本号"; ObjectID = "Aby-nN-l5F"; */
-"Aby-nN-l5F.text" = "版本号";
+/* Class = "UILabel"; text = "内地手机号归属地测试"; ObjectID = "Aby-nN-l5F"; */
+"Aby-nN-l5F.text" = "内地手机号归属地查询";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "Boe-Kq-JvX"; */
 "Boe-Kq-JvX.text" = "Label";
 
-/* Class = "UITableViewSection"; footerTitle = "* 关键词拦截功能，需要你自行安装“防骚扰大师”之类的App。CallKiller将对此类软件的识别结果进行关键词匹配。"; ObjectID = "ENJ-Ja-TcT"; */
-"ENJ-Ja-TcT.footerTitle" = "* 关键词拦截功能，需要你自行安装“防骚扰大师”之类的App，并写入号码库到系统后，才能正常工作。CallKiller将对此类软件的识别结果进行关键词匹配。个人开发者精力和能力有限，难以自行维护号码数据库，望理解。";
+/* Class = "UITableViewSection"; footerTitle = "* 关键词拦截功能，需要你自行安装“防骚扰大师”之类的App，并写入号码库到系统后，才能正常工作。CallKiller将对此类软件的识别结果进行关键词匹配。个人开发者精力和能力有限，难以自行维护号码数据库，望理解。"; ObjectID = "ENJ-Ja-TcT"; */
+"ENJ-Ja-TcT.footerTitle" = "* 仅适用于中国内地\n** 关键词拦截功能，需要你自行安装“防骚扰大师”之类的App，并写入号码库到系统后，才能正常工作。CallKiller将对此类软件的识别结果进行关键词匹配。个人开发者精力和能力有限，难以自行维护号码数据库，望理解。";
+
+/* Class = "UINavigationItem"; title = "按归属地拦截手机号"; ObjectID = "Ggw-PO-dFE"; */
+"Ggw-PO-dFE.title" = "按归属地拦截手机号";
 
 /* Class = "UINavigationItem"; title = "CallKiller"; ObjectID = "I1h-UH-vWR"; */
 "I1h-UH-vWR.title" = "CallKiller";
@@ -29,8 +35,11 @@
 /* Class = "UILabel"; text = "拦截「未知号码」"; ObjectID = "KOI-i6-3HF"; */
 "KOI-i6-3HF.text" = "拦截「未知号码」";
 
-/* Class = "UILabel"; text = "Label"; ObjectID = "NV7-yY-f4m"; */
-"NV7-yY-f4m.text" = "Label";
+/* Class = "UILabel"; text = "Label"; ObjectID = "La8-46-pNw"; */
+"La8-46-pNw.text" = "Label";
+
+/* Class = "UISearchBar"; placeholder = "输入关键字"; ObjectID = "Mxi-bD-0Lk"; */
+"Mxi-bD-0Lk.placeholder" = "输入关键字";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "OuF-I6-aFg"; */
 "OuF-I6-aFg.text" = "Title";
@@ -41,35 +50,68 @@
 /* Class = "UILabel"; text = "Label"; ObjectID = "Qod-Kr-Alc"; */
 "Qod-Kr-Alc.text" = "Label";
 
+/* Class = "UILabel"; text = "按归属地拦截手机号(中国内地)"; ObjectID = "Rvt-ix-4ru"; */
+"Rvt-ix-4ru.text" = "按归属地拦截手机号 *";
+
 /* Class = "UILabel"; text = "放行联系人"; ObjectID = "Ttl-2b-vDT"; */
 "Ttl-2b-vDT.text" = "放行联系人";
 
 /* Class = "UILabel"; text = "无锡市"; ObjectID = "USm-tZ-hSQ"; */
 "USm-tZ-hSQ.text" = "无锡市";
 
-/* Class = "UILabel"; text = "支付宝捐赠"; ObjectID = "Wh0-qr-11W"; */
-"Wh0-qr-11W.text" = "支付宝捐赠";
+/* Class = "UIBarButtonItem"; title = "全选"; ObjectID = "ZhZ-JO-AzB"; */
+"ZhZ-JO-AzB.title" = "全选";
+
+/* Class = "UIBarButtonItem"; title = "全选"; ObjectID = "aeJ-an-yEB"; */
+"aeJ-an-yEB.title" = "全选";
 
 /* Class = "UILabel"; text = "Detail"; ObjectID = "d9d-ZO-bln"; */
 "d9d-ZO-bln.text" = "Detail";
 
-/* Class = "UILabel"; text = "捐赠名单"; ObjectID = "fJI-NP-7UX"; */
-"fJI-NP-7UX.text" = "捐赠名单";
-
 /* Class = "UIBarButtonItem"; title = "退出"; ObjectID = "fTK-Zy-mgO"; */
 "fTK-Zy-mgO.title" = "退出";
+
+/* Class = "UILabel"; text = "归属地数据库版本号"; ObjectID = "g4Z-o3-HuL"; */
+"g4Z-o3-HuL.text" = "归属地数据库版本号";
+
+/* Class = "UILabel"; text = "版本号"; ObjectID = "ike-c6-maK"; */
+"ike-c6-maK.text" = "版本号";
 
 /* Class = "UINavigationItem"; title = "拦截关键词"; ObjectID = "mFb-xq-vUc"; */
 "mFb-xq-vUc.title" = "拦截关键词";
 
+/* Class = "UISearchBar"; placeholder = "输入关键字"; ObjectID = "n0l-DE-jel"; */
+"n0l-DE-jel.placeholder" = "输入关键字";
+
 /* Class = "UILabel"; text = "拦截关键词 *"; ObjectID = "nQf-Z5-fYM"; */
-"nQf-Z5-fYM.text" = "拦截关键词 *";
+"nQf-Z5-fYM.text" = "拦截关键词 **";
 
 /* Class = "UILabel"; text = "号码黑名单"; ObjectID = "rt1-i0-rUv"; */
 "rt1-i0-rUv.text" = "号码黑名单";
 
+/* Class = "UILabel"; text = "无锡市"; ObjectID = "sPx-S6-YV2"; */
+"sPx-S6-YV2.text" = "无锡市";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "tMe-7W-7MG"; */
+"tMe-7W-7MG.text" = "Label";
+
+/* Class = "UILabel"; text = "支付宝捐赠"; ObjectID = "tsZ-aX-oIw"; */
+"tsZ-aX-oIw.text" = "支付宝捐赠";
+
+/* Class = "UILabel"; text = "全部拦截"; ObjectID = "vNs-sR-u19"; */
+"vNs-sR-u19.text" = "全部拦截";
+
 /* Class = "UILabel"; text = "启用"; ObjectID = "yH8-rm-lmu"; */
 "yH8-rm-lmu.text" = "启用";
 
-/* Class = "UINavigationItem"; title = "按区号拦截"; ObjectID = "zOF-mO-cI1"; */
-"zOF-mO-cI1.title" = "按区号拦截";
+/* Class = "UILabel"; text = "捐赠名单"; ObjectID = "zBI-1p-dE7"; */
+"zBI-1p-dE7.text" = "捐赠名单";
+
+/* Class = "UINavigationItem"; title = "按区号拦截固话"; ObjectID = "zOF-mO-cI1"; */
+"zOF-mO-cI1.title" = "按区号拦截固话";
+
+/* Class = "UILabel"; text = "捐赠名单"; ObjectID = "yN3-Av-FQ1"; */
+"yN3-Av-FQ1.text" = "免责声明";
+
+/* Class = "UILabel"; text = "捐赠名单"; ObjectID = "qze-rW-gOX"; */
+"qze-rW-gOX.text" = "开源组件";

@@ -7,9 +7,9 @@
 
 #import <UIKit/UIKit.h>
 #import "AlertUtil.h"
-#import "MBProgressHUD.h"
+#import "JGProgressHUD.h"
 
-static MBProgressHUD *hud = nil;
+static JGProgressHUD *sharedHud = nil;
 
 @implementation AlertUtil
 
@@ -40,21 +40,40 @@ static MBProgressHUD *hud = nil;
     }];
 }
 
-+ (void) showWaitingHud {
-    [AlertUtil hideWaitingHud];
-    hud = [MBProgressHUD showHUDAddedTo:UIApplication.sharedApplication.keyWindow.rootViewController.view animated:YES];
-    hud.bezelView.color = [UIColor lightGrayColor];
-    hud.mode = MBProgressHUDModeIndeterminate;
-    hud.detailsLabel.textColor = [UIColor darkGrayColor];
-    hud.detailsLabel.font = [UIFont boldSystemFontOfSize:17];
-    hud.detailsLabel.text = @"Loading...";
-    hud.userInteractionEnabled = YES;
++ (void) hideHud {
+    if (sharedHud) {
+        [sharedHud dismissAnimated:NO];
+    }
+    sharedHud = nil;
 }
 
-+ (void) hideWaitingHud {
-    if (hud) {
-        [hud hideAnimated:NO];
-        hud = nil;
++ (void) showWaitingHud:(NSString *)text {
+    [AlertUtil hideHud];
+    sharedHud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleDark];
+    sharedHud.indicatorView = [JGProgressHUDIndeterminateIndicatorView new];
+    if (text)
+        sharedHud.textLabel.text = text;
+    [sharedHud showInView:UIApplication.sharedApplication.keyWindow.rootViewController.view animated:NO];
+}
+
++ (void) updateHudText:(NSString *)text {
+    if (sharedHud) {
+        sharedHud.textLabel.text = text;
+    }
+}
+
++ (void) showProgressHud:(NSString *)text {
+    [AlertUtil hideHud];
+    sharedHud = [JGProgressHUD progressHUDWithStyle:JGProgressHUDStyleDark];
+    sharedHud.indicatorView = [JGProgressHUDPieIndicatorView new];
+    if (text)
+        sharedHud.textLabel.text = text;
+    [sharedHud showInView:UIApplication.sharedApplication.keyWindow.rootViewController.view animated:NO];
+}
+
++ (void) updateHudProgress:(float)ratio {
+    if (sharedHud) {
+        [sharedHud setProgress:ratio animated:NO];
     }
 }
 

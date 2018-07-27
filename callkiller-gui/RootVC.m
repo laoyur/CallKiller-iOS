@@ -11,6 +11,7 @@
 #import "Preference.h"
 #import "AlertUtil.h"
 #import "AFNetworking.h"
+#import "MobileRegionDetector.h"
 
 #define kDonationAlipayAccount @"PLACEHOLDER"
 
@@ -21,10 +22,12 @@
 @property (weak, nonatomic) IBOutlet UISwitch *blockingUnknownSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *contactBypassSwitch;
 @property (weak, nonatomic) IBOutlet UILabel *citiesBlockedCount;
+@property (weak, nonatomic) IBOutlet UILabel *mobileCitiesBlockedCount;
 @property (weak, nonatomic) IBOutlet UILabel *blackListCountLabel;
 @property (weak, nonatomic) IBOutlet UILabel *blackKeywordsCount;
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
-
+@property (weak, nonatomic) IBOutlet UILabel *phonedatVersionLabel;
+@property (copy, nonatomic) NSArray *cityGroups;
 @end
 
 @implementation RootVC
@@ -32,7 +35,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    NSString *jsonFilePath = [[NSBundle mainBundle] pathForResource:@"cities" ofType:@"json"];
+    self.cityGroups = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:jsonFilePath] options:kNilOptions error:nil];
+    
     self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+    self.phonedatVersionLabel.text = [[MobileRegionDetector sharedInstance] dbVersion];
     
     NSMutableDictionary *pref = [[Preference sharedInstance] pref];
 
@@ -50,6 +57,13 @@
         self.citiesBlockedCount.text = [NSString stringWithFormat:NSLocalizedString(@"city-block-count-fmt", nil), citiesBlocked.count];
     } else {
         self.citiesBlockedCount.text = NSLocalizedString(@"no-config", nil);
+    }
+    
+    NSArray *mobileCitiesBlocked = pref[kKeyMobileBlockedCitiesFlattened];
+    if (mobileCitiesBlocked.count > 0) {
+        self.mobileCitiesBlockedCount.text = [NSString stringWithFormat:NSLocalizedString(@"city-block-count-fmt", nil), mobileCitiesBlocked.count];
+    } else {
+        self.mobileCitiesBlockedCount.text = NSLocalizedString(@"no-config", nil);
     }
     
     NSArray *blacklist = pref[kKeyBlacklist];
@@ -99,6 +113,10 @@
     if ([cell.reuseIdentifier isEqualToString:@"cell.zone"]) {
         ZoneVC *zone = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.zones"];
         [self.navigationController pushViewController:zone animated:YES];
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.mobilezone"]) {
+        ZoneVC *zone = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.mobilezones"];
+        zone.forMobile = YES;
+        [self.navigationController pushViewController:zone animated:YES];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.blacklist"]) {
         UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.blacklist"];
         [self.navigationController pushViewController:vc animated:YES];
@@ -106,13 +124,13 @@
         UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.blackkeywords"];
         [self.navigationController pushViewController:vc animated:YES];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.donationlist"]) {
-        [AlertUtil showWaitingHud];
+        [AlertUtil showWaitingHud:@"Loading..."];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         AFHTTPSessionManager *http = [AFHTTPSessionManager manager];
         http.requestSerializer = [AFHTTPRequestSerializer serializer];
         http.requestSerializer.timeoutInterval = 10;
         [http GET:@"https://donation.laoyur.com/?app=callkiller" parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-            [AlertUtil hideWaitingHud];
+            [AlertUtil hideHud];
             NSArray *list = responseObject;
             NSMutableString *content = [NSMutableString new];
             
@@ -152,13 +170,75 @@
             }];
             
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-            [AlertUtil hideWaitingHud];
+            [AlertUtil hideHud];
             [AlertUtil showInfo:NSLocalizedString(@"error-title", nil) message:NSLocalizedString(@"error-content", nil)];
         }];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.donation"]) {
         [self donate];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.mobiletest"]) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"mobile-query-alert-title", nil) message:nil preferredStyle:UIAlertControllerStyleAlert];
+        [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+            textField.keyboardType = UIKeyboardTypeNumberPad;
+            textField.placeholder = NSLocalizedString(@"mobile-query-placeholer", nil);
+        }];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil) style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            //
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+            NSArray *words = [alert.textFields[0].text componentsSeparatedByCharactersInSet :[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            NSString *phone = [words componentsJoinedByString:@""];
+            if (phone.length != 11) {
+                [AlertUtil showInfo:NSLocalizedString(@"invalid-mobile-format", nil) message:nil];
+                return;
+            }
+            NSDate *start = [NSDate date];
+            NSString *code = [[MobileRegionDetector sharedInstance] detectRegionCode:phone];
+            NSDate *stop = [NSDate date];
+            NSTimeInterval interval = [stop timeIntervalSinceDate:start];
+            NSString *locationString = NSLocalizedString(@"unknown", nil);
+            if (code.length > 0) {
+                NSDictionary *info = [self findCityInfoWithCode:code];
+                if (info) {
+                    if ([info[@"zhixiashi"] boolValue])
+                        locationString = info[@"city"];
+                    else
+                        locationString = [NSString stringWithFormat:@"%@ - %@", info[@"province"], info[@"city"]];
+                }
+            } else {
+                code = NSLocalizedString(@"unknown", nil);
+            }
+            
+            [AlertUtil showInfo:phone message:[NSString stringWithFormat:NSLocalizedString(@"mobile-query-location-fmt", nil), 
+                                               interval * 1000, 
+                                               locationString,
+                                               code]];
+        }]];
+        [UIApplication.sharedApplication.keyWindow.rootViewController presentViewController:alert animated:YES completion:nil];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.eula"]) {
+        [AlertUtil showInfo:NSLocalizedString(@"eula-content", nil) message:nil];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.opensource"]) {
+        UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.opensource"];
+        [self.navigationController pushViewController:vc animated:YES];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    } 
+}
+
+- (NSDictionary *)findCityInfoWithCode:(NSString *)code {
+    for (NSDictionary *group in self.cityGroups) {
+        for (NSString *c in group[@"cities"]) {
+            if ([c isEqualToString:code]) {
+                return @{
+                         @"province": group[@"name"],
+                         @"zhixiashi": @([group[@"group"] isEqualToString:@"zhixiashi"]),
+                         @"city": group[@"cities"][c],
+                         };
+            }
+        }
     }
+    return nil;
 }
 
 - (void)donate {

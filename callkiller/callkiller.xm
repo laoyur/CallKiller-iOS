@@ -17,6 +17,7 @@
 
 #import "statics.h"
 #import "Preference.h"
+#import "MobileRegionDetector.h"
 
 #define SQLITE_OPEN_READONLY 0x00000001
 #define kCallDbPath @"/var/mobile/Library/CallDirectory/CallDirectory.db"
@@ -72,11 +73,23 @@ static BOOL isCallInBlackList(TUCall *call) {
     }
     
     if ([phonenumber hasPrefix:@"0"]) {
-        // 按区号拦截规则
+        // 固话，按区号拦截规则
         for (NSString *phonePrefix in pref[kKeyBlockedCitiesFlattened]) {
             if ([phonenumber hasPrefix:phonePrefix]) {
                 return YES;
             }
+        }
+    } else if (phonenumber.length == 11 && 
+               ([phonenumber hasPrefix:@"13"] ||
+                [phonenumber hasPrefix:@"15"] ||
+                [phonenumber hasPrefix:@"17"] ||
+                [phonenumber hasPrefix:@"18"] ||
+                [phonenumber hasPrefix:@"19"] )) 
+        {
+        // 手机号，按归属地拦截规则
+        NSString *regionCode = [[MobileRegionDetector sharedInstance] detectRegionCode:phonenumber];
+        if (regionCode.length > 0 && [pref[kKeyMobileBlockedCitiesFlattened] containsObject:regionCode]) {
+            return YES;
         }
     }
 
@@ -213,18 +226,25 @@ static BOOL isCallInBlackList(TUCall *call) {
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
     
+//    freopen("/var/mobile/callkiller.log", "a+", stderr);
+    
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
+//        NSLog(@"open call db");
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    // 只读方式打开
+//        NSLog(@"db opened");
     }
+//    NSLog(@"notify_register_dispatch");
     int token;
     notify_register_dispatch("com.laoyur.callkiller.preference-updated", &token, dispatch_get_main_queue(), ^(int token) {
         pref = [Preference load];
         // Log("== pref updated: %@", pref);
     });
+//    NSLog(@"load pref");
     pref = [Preference load];
+//    NSLog(@"done !!");
 }
 
 %end

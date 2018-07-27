@@ -31,3 +31,11 @@
 "add-keyword-title" = "Add keyword";
 "add-keyword-content" = "Wildcard is NOT supported";
 "del-all-keywords-prompt" = "Sure to delete all keywords?";
+
+"unknown" = "Unknown";
+"mobile-query-location-fmt" = "time cost：%.6f ms\ncity：%@\narea number：%@";
+"mobile-query-placeholer" = "Please enter mobile phone number";
+"mobile-query-alert-title" = "Mobile area query";
+"invalid-mobile-format" = "Invalid mobile phone number!";
+
+"eula-content" = "Take your own risk to use this tweak! \nThe developer takes no responsibility for your missing calls.";

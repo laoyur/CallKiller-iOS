@@ -10,9 +10,12 @@
 #define kKeyEnabled @"enabled"
 #define kKeyBlockUnknown @"block-unknown-enabled"
 #define kKeyBypassContacts @"bypass-contacts-enabled"
-#define kKeyBlockedGroups @"blocked-groups" // 按省拦截
-#define kKeyBlockedCities @"blocked-cities" // 按市拦截
+#define kKeyBlockedGroups @"blocked-groups" // 座机按省拦截
+#define kKeyBlockedCities @"blocked-cities" // 座机按市拦截
 #define kKeyBlockedCitiesFlattened @"blocked-cities-flattened" // for springboard
+#define kKeyMobileBlockedGroups @"mobile-blocked-groups" // 手机号按省拦截
+#define kKeyMobileBlockedCities @"mobile-blocked-cities" // 手机号按市拦截
+#define kKeyMobileBlockedCitiesFlattened @"mobile-blocked-cities-flattened" // for springboard
 #define kKeyBlacklist @"blacklist"
 #define kKeyBlackKeywords @"keywords"
 
