@@ -127,6 +127,8 @@
 @property (copy, nonatomic) NSArray *cityGroups;
 @property (strong, nonatomic) NSMutableArray *filteredCityGroups;
 @property (strong, nonatomic) NSMutableArray *notificationObservers;
+@property (nonatomic) BOOL checkAllPermitted;
+
 @end
 
 @implementation ZoneVC
@@ -134,6 +136,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.checkAllPermitted = YES;
     self.notificationObservers = [NSMutableArray new];
     NSString *jsonFilePath = [[NSBundle mainBundle] pathForResource:@"cities" ofType:@"json"];
     NSArray *groups = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:jsonFilePath] options:kNilOptions error:nil];
@@ -149,6 +152,7 @@
     }
     self.cityGroups = finalGroups;
     self.filteredCityGroups = [finalGroups mutableDeepCopy];
+    [self updateCheckAllButton];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -213,7 +217,15 @@
             }
         }
         [[Preference sharedInstance] save];
-        [self.tableview reloadData];
+        [self updateCheckAllButton];
+        self.tableview.userInteractionEnabled = NO;
+        self.checkAllButton.enabled = NO;
+        [[GCDQueue mainQueue] queueBlock:^{
+            [self.tableview reloadData];
+            self.tableview.userInteractionEnabled = YES;
+            if (self.checkAllPermitted)
+                self.checkAllButton.enabled = YES;
+        } afterDelay:0.4];
     }];
     [self.notificationObservers addObject:observer];
 }
@@ -231,42 +243,101 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (BOOL)isAllGroupsChecked {
+    NSDictionary *pref = [[Preference sharedInstance] pref];
+    NSString *key = self.forMobile ? kKeyMobileBlockedGroups : kKeyBlockedGroups;
+    for (NSDictionary *group in self.cityGroups) {
+        if (![pref[key] containsObject:group[@"group"]])
+            return NO;
+    }
+    return YES;
+}
+
+- (void)updateCheckAllButton {
+    if ([self isAllGroupsChecked]) {
+        self.checkAllButton.title = NSLocalizedString(@"uncheck-all", nil);
+    } else {
+        self.checkAllButton.title = NSLocalizedString(@"check-all", nil);
+    }
+}
+
 - (IBAction)onCheckAll:(id)sender {
     NSMutableDictionary *pref = [[Preference sharedInstance] pref];
+    BOOL isToUncheck = [self isAllGroupsChecked];
     if (self.forMobile) {
-        if (!pref[kKeyMobileBlockedCitiesFlattened])
-            pref[kKeyMobileBlockedCitiesFlattened] = [NSMutableArray new];
-        if (!pref[kKeyMobileBlockedGroups])
-            pref[kKeyMobileBlockedGroups] = [NSMutableArray new];
-        for (NSDictionary *g in self.filteredCityGroups) {
-            if (![pref[kKeyMobileBlockedGroups] containsObject:g[@"group"]]) {
-                [pref[kKeyMobileBlockedGroups] addObject:g[@"group"]];
+        if (isToUncheck) {
+            // 手机号取消全部省
+            for (NSDictionary *g in self.cityGroups) {
+                NSString *groupKey = g[@"group"];
+                for (NSString *cityKey in g[@"allCityKeys"]) {
+                    if (![pref[kKeyMobileBlockedCities][groupKey] containsObject:cityKey]) {
+                        [pref[kKeyMobileBlockedCitiesFlattened] removeObject:cityKey];
+                    }
+                }
             }
-            for (NSString *cityKey in g[@"allCityKeys"]) {
-                if (![pref[kKeyMobileBlockedCitiesFlattened] containsObject:cityKey]) {
-                    [pref[kKeyMobileBlockedCitiesFlattened] addObject:cityKey];
+            [pref[kKeyMobileBlockedGroups] removeAllObjects];
+        } else {
+            // 手机号勾选所有省
+            if (!pref[kKeyMobileBlockedCitiesFlattened])
+                pref[kKeyMobileBlockedCitiesFlattened] = [NSMutableArray new];
+            if (!pref[kKeyMobileBlockedGroups])
+                pref[kKeyMobileBlockedGroups] = [NSMutableArray new];
+            for (NSDictionary *g in self.filteredCityGroups) {
+                if (![pref[kKeyMobileBlockedGroups] containsObject:g[@"group"]]) {
+                    [pref[kKeyMobileBlockedGroups] addObject:g[@"group"]];
+                }
+                for (NSString *cityKey in g[@"allCityKeys"]) {
+                    if (![pref[kKeyMobileBlockedCitiesFlattened] containsObject:cityKey]) {
+                        [pref[kKeyMobileBlockedCitiesFlattened] addObject:cityKey];
+                    }
                 }
             }
         }
     } else {
-        if (!pref[kKeyBlockedCitiesFlattened])
-            pref[kKeyBlockedCitiesFlattened] = [NSMutableArray new];
-        if (!pref[kKeyBlockedGroups])
-            pref[kKeyBlockedGroups] = [NSMutableArray new];
-        for (NSDictionary *g in self.filteredCityGroups) {
-            if (![pref[kKeyBlockedGroups] containsObject:g[@"group"]]) {
-                [pref[kKeyBlockedGroups] addObject:g[@"group"]];
+        if (isToUncheck) {
+            // 固话取消所有省
+            for (NSDictionary *g in self.cityGroups) {
+                NSString *groupKey = g[@"group"];
+                for (NSString *cityKey in g[@"allCityKeys"]) {
+                    if (![pref[kKeyBlockedCities][groupKey] containsObject:cityKey]) {
+                        [pref[kKeyBlockedCitiesFlattened] removeObject:cityKey];
+                    }
+                }
             }
-            for (NSString *cityKey in g[@"allCityKeys"]) {
-                if (![pref[kKeyBlockedCitiesFlattened] containsObject:cityKey]) {
-                    [pref[kKeyBlockedCitiesFlattened] addObject:cityKey];
+            [pref[kKeyBlockedGroups] removeAllObjects];
+        } else {
+            // 固话勾选所有省
+            if (!pref[kKeyBlockedCitiesFlattened])
+                pref[kKeyBlockedCitiesFlattened] = [NSMutableArray new];
+            if (!pref[kKeyBlockedGroups])
+                pref[kKeyBlockedGroups] = [NSMutableArray new];
+            for (NSDictionary *g in self.filteredCityGroups) {
+                if (![pref[kKeyBlockedGroups] containsObject:g[@"group"]]) {
+                    [pref[kKeyBlockedGroups] addObject:g[@"group"]];
+                }
+                for (NSString *cityKey in g[@"allCityKeys"]) {
+                    if (![pref[kKeyBlockedCitiesFlattened] containsObject:cityKey]) {
+                        [pref[kKeyBlockedCitiesFlattened] addObject:cityKey];
+                    }
                 }
             }
         }
     }
-
+    for (UITableViewCell *cell in self.tableview.visibleCells) {
+        if ([cell isKindOfClass:ZoneProvinceCell.class]) {
+            ZoneProvinceCell *c = (ZoneProvinceCell*)cell;
+            [c.enabled setOn:!isToUncheck animated:YES];
+        }
+    }
     [[Preference sharedInstance] save];
-    [self.tableview reloadData];
+    [self updateCheckAllButton];
+    self.tableview.userInteractionEnabled = NO;
+    self.checkAllButton.enabled = NO;
+    [[GCDQueue mainQueue] queueBlock:^{
+        [self.tableview reloadData];
+        self.tableview.userInteractionEnabled = YES;
+        self.checkAllButton.enabled = YES;
+    } afterDelay:0.4];
 }
 
 
@@ -316,8 +387,10 @@
     if ([keyword stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].length == 0) {
         self.filteredCityGroups = [self.cityGroups mutableCopy];
         self.checkAllButton.enabled = YES;
+        self.checkAllPermitted = YES;
     } else {
         self.checkAllButton.enabled = NO;
+        self.checkAllPermitted = NO;
         [self.filteredCityGroups removeAllObjects];
         for (NSDictionary *group in self.cityGroups) {
             if ([group[@"name"] containsString:keyword]) {

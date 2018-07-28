@@ -39,3 +39,5 @@
 "invalid-mobile-format" = "Invalid mobile phone number!";
 
 "eula-content" = "Take your own risk to use this tweak! \nThe developer takes no responsibility for your missing calls.";
+"check-all" = "Check All";
+"uncheck-all" = "Uncheck All";
