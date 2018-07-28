@@ -20,3 +20,7 @@
 @interface NSArray (MutableDeepCopy) <MutableDeepCopying>
 @end
 
+@interface NSString (CKAdditional)
+- (NSString *)trimming;
+- (BOOL) isVersionStringGE:(NSString *)version;
+@end

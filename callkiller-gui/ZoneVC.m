@@ -40,8 +40,8 @@
                 [pref[kKeyMobileBlockedGroups] removeObject:self.group];
             }
         } else {
-            if ([pref[kKeyMobileBlockedGroups] containsObject:self.group]) {
-                [pref[kKeyMobileBlockedGroups] removeObject:self.group];
+            if ([pref[kKeyBlockedGroups] containsObject:self.group]) {
+                [pref[kKeyBlockedGroups] removeObject:self.group];
             }
         }
     }
@@ -126,13 +126,15 @@
 
 @property (copy, nonatomic) NSArray *cityGroups;
 @property (strong, nonatomic) NSMutableArray *filteredCityGroups;
-
+@property (strong, nonatomic) NSMutableArray *notificationObservers;
 @end
 
 @implementation ZoneVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.notificationObservers = [NSMutableArray new];
     NSString *jsonFilePath = [[NSBundle mainBundle] pathForResource:@"cities" ofType:@"json"];
     NSArray *groups = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:jsonFilePath] options:kNilOptions error:nil];
     
@@ -147,12 +149,30 @@
     }
     self.cityGroups = finalGroups;
     self.filteredCityGroups = [finalGroups mutableDeepCopy];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardWillShowNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        NSDictionary *keyInfo = [note userInfo];
+        CGRect keyboardFrame = [[keyInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
+        self.tableviewBottom.constant = keyboardFrame.size.height;
+        if (self.tableview.contentOffset.y < 0) {
+            self.tableview.contentOffset = CGPointMake(self.tableview.contentOffset.x, self.tableview.contentOffset.y -keyboardFrame.size.height);
+        }
+    }];
+    [self.notificationObservers addObject:observer];
     
-    [[NSNotificationCenter defaultCenter] addObserverForName:@"group-blocking-changed" object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+    observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardWillHideNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        self.tableviewBottom.constant = 0;
+    }];
+    [self.notificationObservers addObject:observer];
+    
+    observer = [[NSNotificationCenter defaultCenter] addObserverForName:@"group-blocking-changed" object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
         
         NSMutableDictionary *pref = [[Preference sharedInstance] pref];
         NSDictionary *info = note.userInfo;
-        for (NSDictionary *g in self.filteredCityGroups) {
+        for (NSDictionary *g in self.cityGroups) {
             if ([g[@"group"] isEqualToString:info[@"group"]]) {
                 if ([info[@"enabled"] boolValue]) {
                     // 启用按省拦截
@@ -195,26 +215,15 @@
         [[Preference sharedInstance] save];
         [self.tableview reloadData];
     }];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardWillShowNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        NSDictionary *keyInfo = [note userInfo];
-        CGRect keyboardFrame = [[keyInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
-        self.tableviewBottom.constant = keyboardFrame.size.height;
-        if (self.tableview.contentOffset.y < 0) {
-            self.tableview.contentOffset = CGPointMake(self.tableview.contentOffset.x, self.tableview.contentOffset.y -keyboardFrame.size.height);
-        }
-    }];
-    [[NSNotificationCenter defaultCenter] addObserverForName:UIKeyboardWillHideNotification object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
-        self.tableviewBottom.constant = 0;
-    }];
+    [self.notificationObservers addObject:observer];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    for (id observer in self.notificationObservers) {
+        [[NSNotificationCenter defaultCenter] removeObserver:observer];
+    }
+    [self.notificationObservers removeAllObjects];
 }
 
 - (void)didReceiveMemoryWarning {

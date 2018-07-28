@@ -50,6 +50,8 @@
     [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     UIAlertAction *confirm = [UIAlertAction actionWithTitle:NSLocalizedString(@"ok", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         NSString *number = alert.textFields[0].text;
+        NSArray *words = [number componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        number = [words componentsJoinedByString:@""];
         if (number.length) {
             number = [number stringByReplacingOccurrencesOfString:@"**" withString:@"*"];
             number = [number stringByReplacingOccurrencesOfString:@"*?" withString:@"*"];
@@ -153,7 +155,7 @@
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789?*"] invertedSet];
+    NSCharacterSet *cs = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789?* "] invertedSet];
     NSString *filteredstring = [[string componentsSeparatedByCharactersInSet:cs] componentsJoinedByString:@""];
     BOOL allow = [string isEqualToString:filteredstring];
     if (allow) {

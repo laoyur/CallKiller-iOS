@@ -42,6 +42,7 @@ static BOOL didMigrate = NO;
 }
 
 -(void)save {
+    _pref[kKeyPrefVersion] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:nil];
     if (data) {
         [data writeToFile:kCallKillerPreferenceFilePath atomically:YES];
@@ -50,6 +51,7 @@ static BOOL didMigrate = NO;
 }
 
 -(void)saveOnly {
+    _pref[kKeyPrefVersion] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
     NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:nil];
     if (data) {
         [data writeToFile:kCallKillerPreferenceFilePath atomically:YES];

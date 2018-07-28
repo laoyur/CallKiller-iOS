@@ -14,6 +14,7 @@
 #import "CXCall.h"
 #import "TUProxyCall.h"
 #import "TUHandle.h"
+#import "CHRecentCall.h"
 
 #import "statics.h"
 #import "Preference.h"
@@ -43,7 +44,7 @@ static void Log(const char *fmt, ...) {
     va_end(arg_ptr); 
     
     // append
-    NSString *path = @"/var/mobile/callkiller.log";
+    NSString *path = @"/var/mobile/callkiller/callkiller.log";
     NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
     [handle truncateFileAtOffset:[handle seekToEndOfFile]];
     [handle writeData:[msg dataUsingEncoding:NSUTF8StringEncoding]];
@@ -225,8 +226,8 @@ static BOOL isCallInBlackList(TUCall *call) {
 
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
+//    freopen("/var/mobile/callkiller/callkiller.log", "a+", stderr);
     
-//    freopen("/var/mobile/callkiller.log", "a+", stderr);
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
 //        NSLog(@"open call db");
@@ -243,9 +244,34 @@ static BOOL isCallInBlackList(TUCall *call) {
         // Log("== pref updated: %@", pref);
     });
 //    NSLog(@"load pref");
+    
     pref = [Preference load];
 //    NSLog(@"done !!");
 }
 
 %end
 
+/*
+%hook MPRecentsTableViewController
+- (void)viewDidLoad {
+    %orig;
+    Log("MPRecentsTableViewController viewDidLoad");
+}
+%end
+
+%hook MPRecentsTableViewCell
+
+- (void) setCall:(CHRecentCall*)call {
+    %orig;
+    Log("recent call: %@", call);
+}
+
+%end
+
+%hook PHRecentCallsTableViewController
+- (void)viewDidLoad {
+    %orig;
+    Log("PHRecentCallsTableViewController viewDidLoad");
+}
+%end
+*/

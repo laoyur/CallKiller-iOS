@@ -38,11 +38,51 @@
     NSString *jsonFilePath = [[NSBundle mainBundle] pathForResource:@"cities" ofType:@"json"];
     self.cityGroups = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:jsonFilePath] options:kNilOptions error:nil];
     
-    self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    self.phonedatVersionLabel.text = [[MobileRegionDetector sharedInstance] dbVersion];
-    
     NSMutableDictionary *pref = [[Preference sharedInstance] pref];
-
+    
+    
+    // 修正1.3.0的一处bug
+    // 重新同步拦截的城市
+    if (!pref[kKeyPrefVersion]) {
+        // 固话
+        NSMutableArray *flattenCities = [NSMutableArray new];
+        for (NSString *group in pref[kKeyBlockedGroups]) {
+            NSDictionary *groupDic = [self findCitiesGroupByGroup:group];
+            [flattenCities addObjectsFromArray:[groupDic[@"cities"] allKeys]];
+        }
+        for (NSString *groupKey in pref[kKeyBlockedCities]) {
+            NSArray *cities = pref[kKeyBlockedCities][groupKey];
+            for (NSString *city in cities) {
+                if (![flattenCities containsObject:city]) {
+                    [flattenCities addObject:city];
+                }
+            }
+        }
+        pref[kKeyBlockedCitiesFlattened] = flattenCities;
+        
+        // 手机号
+        NSMutableArray *mobileFlattenCities = [NSMutableArray new];
+        for (NSString *group in pref[kKeyMobileBlockedGroups]) {
+            NSDictionary *groupDic = [self findCitiesGroupByGroup:group];
+            [mobileFlattenCities addObjectsFromArray:[groupDic[@"cities"] allKeys]];
+        }
+        for (NSString *groupKey in pref[kKeyMobileBlockedCities]) {
+            NSArray *cities = pref[kKeyMobileBlockedCities][groupKey];
+            for (NSString *city in cities) {
+                if (![mobileFlattenCities containsObject:city]) {
+                    [mobileFlattenCities addObject:city];
+                }
+            }
+        }
+        pref[kKeyMobileBlockedCitiesFlattened] = mobileFlattenCities;
+        [[Preference sharedInstance] save];
+    }
+    
+    self.versionLabel.text = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+#if !(TARGET_OS_SIMULATOR)
+    self.phonedatVersionLabel.text = [[MobileRegionDetector sharedInstance] dbVersion];
+#endif
+    
     self.statusLabel.text = [pref[kKeyEnabled] boolValue] ? NSLocalizedString(@"enabled", nil) : NSLocalizedString(@"disabled", nil);
     [self.enableSwitch setOn:[pref[kKeyEnabled] boolValue] animated:NO];
     [self.blockingUnknownSwitch setOn:[pref[kKeyBlockUnknown] boolValue] animated:NO];
@@ -85,6 +125,16 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+- (NSDictionary *)findCitiesGroupByGroup:(NSString *)group {
+    for (NSDictionary *g in self.cityGroups) {
+        if ([g[@"group"] isEqualToString:group]) {
+            return g;
+        }
+    }
+    return nil;
+}
+
 - (IBAction)onSwitchChanged:(id)sender {
     if (sender == self.enableSwitch) {
         [[Preference sharedInstance] pref][kKeyEnabled] = @(self.enableSwitch.isOn);

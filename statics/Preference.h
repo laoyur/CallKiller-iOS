@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+#define kKeyPrefVersion @"version"  // added in 1.3.1
 #define kKeyEnabled @"enabled"
 #define kKeyBlockUnknown @"block-unknown-enabled"
 #define kKeyBypassContacts @"bypass-contacts-enabled"

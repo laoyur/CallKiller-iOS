@@ -212,6 +212,7 @@
 		04996BC321018D5100F8F38B /* AFURLResponseSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLResponseSerialization.m; sourceTree = "<group>"; };
 		04996BC421018D5100F8F38B /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
 		04996BC521018D5100F8F38B /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
+		0499A0BD210C17BD000A6861 /* CHRecentCall.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHRecentCall.h; sourceTree = "<group>"; };
 		04D3A6EB20FF654F00D1CC16 /* callkiller-gui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "callkiller-gui.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04D3A6ED20FF654F00D1CC16 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		04D3A6EE20FF654F00D1CC16 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -309,6 +310,7 @@
 				044CEA6220F74EAF00736308 /* CXCall.h */,
 				044CEA6420F7507B00736308 /* TUProxyCall.h */,
 				044CEA6520F7509300736308 /* TUHandle.h */,
+				0499A0BD210C17BD000A6861 /* CHRecentCall.h */,
 			);
 			path = callkiller;
 			sourceTree = "<group>";

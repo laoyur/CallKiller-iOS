@@ -15,6 +15,7 @@
 #import "CXCall.h"
 #import "TUProxyCall.h"
 #import "TUHandle.h"
+#import "CHRecentCall.h"
 
 #import "statics.h"
 #import "Preference.h"
@@ -44,7 +45,7 @@ static void Log(const char *fmt, ...) {
     va_end(arg_ptr); 
     
     
-    NSString *path = @"/var/mobile/callkiller.log";
+    NSString *path = @"/var/mobile/callkiller/callkiller.log";
     NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
     [handle truncateFileAtOffset:[handle seekToEndOfFile]];
     [handle writeData:[msg dataUsingEncoding:NSUTF8StringEncoding]];
@@ -89,7 +90,7 @@ static BOOL isCallInBlackList(TUCall *call) {
         {
         
         NSString *regionCode = [[MobileRegionDetector sharedInstance] detectRegionCode:phonenumber];
-        if ([pref[kKeyMobileBlockedCitiesFlattened] containsObject:regionCode]) {
+        if (regionCode.length > 0 && [pref[kKeyMobileBlockedCitiesFlattened] containsObject:regionCode]) {
             return YES;
         }
     }
@@ -186,7 +187,7 @@ static BOOL isCallInBlackList(TUCall *call) {
 @class SBTelephonyManager; @class SpringBoard; 
 static void (*_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$)(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void (*_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); 
 
-#line 164 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 165 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
 
 static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, NSNotification* arg1) {
     if (![pref[kKeyEnabled] boolValue]) {
@@ -251,30 +252,55 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
 
 static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, id application) {
     _logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$(self, _cmd, application);
+
     
-    freopen("/var/mobile/callkiller.log", "a+", stderr);
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
-        NSLog(@"open call db");
+
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    
-        NSLog(@"db opened");
+
     }
-    NSLog(@"notify_register_dispatch");
+
     int token;
     notify_register_dispatch("com.laoyur.callkiller.preference-updated", &token, dispatch_get_main_queue(), ^(int token) {
         pref = [Preference load];
         
     });
-    NSLog(@"load pref");
+
+    
     pref = [Preference load];
-    NSLog(@"done !!");
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 static __attribute__((constructor)) void _logosLocalInit() {
 {Class _logos_class$_ungrouped$SBTelephonyManager = objc_getClass("SBTelephonyManager"); MSHookMessageEx(_logos_class$_ungrouped$SBTelephonyManager, @selector(callEventHandler:), (IMP)&_logos_method$_ungrouped$SBTelephonyManager$callEventHandler$, (IMP*)&_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$);Class _logos_class$_ungrouped$SpringBoard = objc_getClass("SpringBoard"); MSHookMessageEx(_logos_class$_ungrouped$SpringBoard, @selector(applicationDidFinishLaunching:), (IMP)&_logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$, (IMP*)&_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$);} }
-#line 252 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 278 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
