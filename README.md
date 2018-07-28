@@ -4,7 +4,11 @@
 ![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-14.jpg)
 ![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-18.jpg)
 
-
+# changes in 1.3.2
+  * 理论上也支持 iOS 10
+  * 支持按归属地拦截手机号
+  * 其他一些细节优化
+  
 # changes in 1.1.0
   * 终于有GUI设置界面了
   * 应该可以拦截未知号码（需进一步测试）
@@ -15,8 +19,8 @@
   * **接受捐赠**。我曾在v2ex上说过不需要捐赠，后来想了想，既然有GUI了，为啥不做一个功能进去呢
 
 # 如何安装
-  * 你可以稍等一两天，已经跟BigBoss沟通过，他们表示1.1.0版可以接受（1.0.0被他们拒绝了）
-  * 直接从Release页面下载编译好的deb
+  * 从BigBoss搜索CallKiller
+  * 直接从Release页面下载编译好的deb，但安装完后可能需要手动uicache一下 :(
   * 下载代码自己编译
 
 # 如何编译
