@@ -83,6 +83,12 @@ EOF
 
 cat > dpkg-tmp/DEBIAN/postinst << EOF
 #!/bin/sh
+chown -R mobile:mobile /var/mobile/callkiller
+chmod -R 755 /var/mobile/callkiller
+if [[ -e /var/mobile/callkiller-pref.json ]]; then
+	chown mobile:mobile /var/mobile/callkiller-pref.json
+	chmod 755 /var/mobile/callkiller-pref.json
+fi
 uicache
 exit 0
 EOF

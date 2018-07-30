@@ -43,18 +43,30 @@ static BOOL didMigrate = NO;
 
 -(void)save {
     _pref[kKeyPrefVersion] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:nil];
+    NSError *err = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:&err];
     if (data) {
-        [data writeToFile:kCallKillerPreferenceFilePath atomically:YES];
+        [data writeToFile:kCallKillerPreferenceFilePath options:NSDataWritingAtomic error:&err];
+        if (err) {
+            Log("== pref json write to file failed: %@", err);
+        }
         notify_post("com.laoyur.callkiller.preference-updated");
+    } else {
+        Log("== pref to json failed: %@", err);
     }
 }
 
 -(void)saveOnly {
     _pref[kKeyPrefVersion] = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
-    NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:nil];
+    NSError *err = nil;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:_pref options:kNilOptions error:&err];
     if (data) {
-        [data writeToFile:kCallKillerPreferenceFilePath atomically:YES];
+        [data writeToFile:kCallKillerPreferenceFilePath options:NSDataWritingAtomic error:&err];
+        if (err) {
+            Log("== pref json write to file failed: %@", err);
+        }
+    } else {
+        Log("== pref to json failed: %@", err);
     }
 }
 
@@ -88,10 +100,19 @@ static BOOL didMigrate = NO;
 +(void)migrate {
     if (didMigrate) // do migrate only once for sb/app lifetime
         return;
+    Log("== migrate called from %@", [[NSBundle mainBundle] bundleIdentifier]);
     NSFileManager *mgr = [NSFileManager defaultManager];
-    if (![mgr fileExistsAtPath:kCallKillerPreferenceFilePath] && [mgr fileExistsAtPath:kCallKillerPreferenceFilePathLegacy]) {
+    BOOL oldPrefExist = [mgr fileExistsAtPath:kCallKillerPreferenceFilePathLegacy];
+    BOOL newPrefExist = [mgr fileExistsAtPath:kCallKillerPreferenceFilePath];
+    Log("old pref exists: %@, new pref exists: %@", oldPrefExist ? @"Y" : @"N", newPrefExist ? @"Y" : @"N");
+    if (oldPrefExist && !newPrefExist) {
+        Log("== do migrate");
         [mgr createDirectoryAtPath:kCallKillerPreferenceFolder withIntermediateDirectories:YES attributes:nil error:nil];
-        [mgr moveItemAtPath:kCallKillerPreferenceFilePathLegacy toPath:kCallKillerPreferenceFilePath error:nil];
+        NSError *err = nil;
+        [mgr moveItemAtPath:kCallKillerPreferenceFilePathLegacy toPath:kCallKillerPreferenceFilePath error:&err];
+        if (err) {
+            Log("== move old pref file to new place failed: %@", err);
+        }
     }
     didMigrate = YES;
 }

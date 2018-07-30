@@ -7,6 +7,7 @@
 
 #import <UIKit/UIKit.h>
 #import <notify.h>
+#import <dlfcn.h>
 
 #import "TUCall.h"
 #import "TUCallCenter.h"
@@ -24,33 +25,12 @@
 #define SQLITE_OPEN_READONLY 0x00000001
 #define kCallDbPath @"/var/mobile/Library/CallDirectory/CallDirectory.db"
 
+typedef int (*DSYSTEM)(const char *);
+static DSYSTEM dsystem = 0;
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
 static BOOL pendingIncomingTUCallBlocked = NO;
 static NSDictionary *pref = nil;
-
-static void Log(const char *fmt, ...) {
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [NSDateFormatter new];
-        [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
-        dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
-    }
-    
-    va_list arg_ptr; 
-    va_start(arg_ptr, fmt); 
-    NSString *format = [[NSString stringWithUTF8String:fmt] stringByAppendingString:@"\n"];
-    NSString *now = [dateFormatter stringFromDate:[NSDate date]];
-    NSString *msg = [[NSString alloc] initWithFormat:[NSString stringWithFormat:@"%@ %@", now, format] arguments:arg_ptr]; 
-    va_end(arg_ptr); 
-    
-    
-    NSString *path = @"/var/mobile/callkiller/callkiller.log";
-    NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
-    [handle truncateFileAtOffset:[handle seekToEndOfFile]];
-    [handle writeData:[msg dataUsingEncoding:NSUTF8StringEncoding]];
-    [handle closeFile];
-}
 
 static BOOL isCallInBlackList(TUCall *call) {
     
@@ -152,7 +132,7 @@ static BOOL isCallInBlackList(TUCall *call) {
         label = [rs stringForColumnIndex:0];
     }
     [rs close];
-    Log("==== label found in db: %@", label);   
+    Log("== label found in db: %@", label);   
     
     NSArray *keywords = pref[kKeyBlackKeywords];
     for (NSString *kwd in keywords) {
@@ -184,10 +164,10 @@ static BOOL isCallInBlackList(TUCall *call) {
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class SBTelephonyManager; @class SpringBoard; 
+@class SpringBoard; @class SBTelephonyManager; 
 static void (*_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$)(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST, SEL, NSNotification*); static void (*_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$)(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(_LOGOS_SELF_TYPE_NORMAL SpringBoard* _LOGOS_SELF_CONST, SEL, id); 
 
-#line 165 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 145 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
 
 static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS_SELF_TYPE_NORMAL SBTelephonyManager* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, NSNotification* arg1) {
     if (![pref[kKeyEnabled] boolValue]) {
@@ -231,11 +211,11 @@ static void _logos_method$_ungrouped$SBTelephonyManager$callEventHandler$(_LOGOS
     } else {
         if (call.isIncoming && call.status == 4) {  
             
-            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
+            Log("== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
-                Log("==== call blocked");
+                Log("== call blocked");
                 pendingIncomingTUCallBlocked = YES;
                 
                 
@@ -254,14 +234,14 @@ static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(
     _logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$(self, _cmd, application);
 
     
+
+
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
-
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    
-
     }
 
     int token;
@@ -269,10 +249,8 @@ static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(
         pref = [Preference load];
         
     });
-
     
     pref = [Preference load];
-
 }
 
 
@@ -303,4 +281,4 @@ static void _logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$(
 
 static __attribute__((constructor)) void _logosLocalInit() {
 {Class _logos_class$_ungrouped$SBTelephonyManager = objc_getClass("SBTelephonyManager"); MSHookMessageEx(_logos_class$_ungrouped$SBTelephonyManager, @selector(callEventHandler:), (IMP)&_logos_method$_ungrouped$SBTelephonyManager$callEventHandler$, (IMP*)&_logos_orig$_ungrouped$SBTelephonyManager$callEventHandler$);Class _logos_class$_ungrouped$SpringBoard = objc_getClass("SpringBoard"); MSHookMessageEx(_logos_class$_ungrouped$SpringBoard, @selector(applicationDidFinishLaunching:), (IMP)&_logos_method$_ungrouped$SpringBoard$applicationDidFinishLaunching$, (IMP*)&_logos_orig$_ungrouped$SpringBoard$applicationDidFinishLaunching$);} }
-#line 278 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"
+#line 256 "/Volumes/data/projects/callkiller/callkiller/callkiller.xm"

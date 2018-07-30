@@ -13,7 +13,7 @@
 #import "AFNetworking.h"
 #import "MobileRegionDetector.h"
 
-#define kDonationAlipayAccount @"PLACEHOLDER"
+#define kDonationAlipayAccount @"PLACEHOLER"
 
 @interface RootVC ()
 
@@ -44,6 +44,7 @@
     // 修正1.3.0的一处bug
     // 重新同步拦截的城市
     if (!pref[kKeyPrefVersion]) {
+        Log("== no version found in pref file, try to fix bugs for 1.3.0");
         // 固话
         NSMutableArray *flattenCities = [NSMutableArray new];
         for (NSString *group in pref[kKeyBlockedGroups]) {

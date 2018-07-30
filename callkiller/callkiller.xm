@@ -6,6 +6,7 @@
 
 #import <UIKit/UIKit.h>
 #import <notify.h>
+#import <dlfcn.h>
 
 #import "TUCall.h"
 #import "TUCallCenter.h"
@@ -23,33 +24,12 @@
 #define SQLITE_OPEN_READONLY 0x00000001
 #define kCallDbPath @"/var/mobile/Library/CallDirectory/CallDirectory.db"
 
+typedef int (*DSYSTEM)(const char *);
+static DSYSTEM dsystem = 0;
 static FMDatabase *db = nil;
 static TUProxyCall *pendingIncomingTUCall = nil;
 static BOOL pendingIncomingTUCallBlocked = NO;
 static NSDictionary *pref = nil;
-
-static void Log(const char *fmt, ...) {
-    static NSDateFormatter *dateFormatter = nil;
-    if (!dateFormatter) {
-        dateFormatter = [NSDateFormatter new];
-        [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
-        dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
-    }
-    
-    va_list arg_ptr; 
-    va_start(arg_ptr, fmt); 
-    NSString *format = [[NSString stringWithUTF8String:fmt] stringByAppendingString:@"\n"];
-    NSString *now = [dateFormatter stringFromDate:[NSDate date]];
-    NSString *msg = [[NSString alloc] initWithFormat:[NSString stringWithFormat:@"%@ %@", now, format] arguments:arg_ptr]; 
-    va_end(arg_ptr); 
-    
-    // append
-    NSString *path = @"/var/mobile/callkiller/callkiller.log";
-    NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
-    [handle truncateFileAtOffset:[handle seekToEndOfFile]];
-    [handle writeData:[msg dataUsingEncoding:NSUTF8StringEncoding]];
-    [handle closeFile];
-}
 
 static BOOL isCallInBlackList(TUCall *call) {
     // ?? 不确定isBlocked这个属性有没有作用
@@ -151,7 +131,7 @@ static BOOL isCallInBlackList(TUCall *call) {
         label = [rs stringForColumnIndex:0];
     }
     [rs close];
-    Log("==== label found in db: %@", label);   // label可能是nil
+    Log("== label found in db: %@", label);   // label可能是nil
     
     NSArray *keywords = pref[kKeyBlackKeywords];
     for (NSString *kwd in keywords) {
@@ -205,11 +185,11 @@ static BOOL isCallInBlackList(TUCall *call) {
     } else {
         if (call.isIncoming && call.status == 4) {  // 4 ringing
             // new incoming call
-            Log("==== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
+            Log("== pendingIncomingTUCall: %@, contact: %@, label: %@, isBlocked: %@", call.handle.value, call.contactIdentifier, call.localizedLabel, call.isBlocked ? @"Y" : @"N");
             pendingIncomingTUCall = call;
             
             if (isCallInBlackList(call)) {
-                Log("==== call blocked");
+                Log("== call blocked");
                 pendingIncomingTUCallBlocked = YES;
                 
                 // it will trigger callEventHandler immediatelly with call.status == 5
@@ -228,25 +208,23 @@ static BOOL isCallInBlackList(TUCall *call) {
     %orig;
 //    freopen("/var/mobile/callkiller/callkiller.log", "a+", stderr);
     
+//    dsystem = (DSYSTEM)dlsym(RTLD_DEFAULT, "system");
+//    dsystem("touch /var/mobile/callkiller/callkiller.log");
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:kCallDbPath]) {
-//        NSLog(@"open call db");
         db = [FMDatabase databaseWithPath:kCallDbPath];
         db.crashOnErrors = NO;
         db.logsErrors = NO;
         [db openWithFlags:SQLITE_OPEN_READONLY];    // 只读方式打开
-//        NSLog(@"db opened");
     }
-//    NSLog(@"notify_register_dispatch");
+
     int token;
     notify_register_dispatch("com.laoyur.callkiller.preference-updated", &token, dispatch_get_main_queue(), ^(int token) {
         pref = [Preference load];
         // Log("== pref updated: %@", pref);
     });
-//    NSLog(@"load pref");
     
     pref = [Preference load];
-//    NSLog(@"done !!");
 }
 
 %end

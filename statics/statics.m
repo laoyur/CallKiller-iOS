@@ -7,6 +7,29 @@
 
 #import "statics.h"
 
+void Log(const char *fmt, ...) {
+    static NSDateFormatter *dateFormatter = nil;
+    if (!dateFormatter) {
+        dateFormatter = [NSDateFormatter new];
+        [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"Asia/Shanghai"]];
+        dateFormatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS";
+    }
+    
+    va_list arg_ptr; 
+    va_start(arg_ptr, fmt); 
+    NSString *format = [[NSString stringWithUTF8String:fmt] stringByAppendingString:@"\n"];
+    NSString *now = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *msg = [[NSString alloc] initWithFormat:[NSString stringWithFormat:@"%@ %@", now, format] arguments:arg_ptr]; 
+    va_end(arg_ptr); 
+    
+    // append
+    NSString *path = @"/var/mobile/callkiller/callkiller.log";
+    NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath:path];
+    [handle truncateFileAtOffset:[handle seekToEndOfFile]];
+    [handle writeData:[msg dataUsingEncoding:NSUTF8StringEncoding]];
+    [handle closeFile];
+}
+
 @implementation NSDictionary (MutableDeepCopy)
 - (NSMutableDictionary *) mutableDeepCopy {
     NSMutableDictionary * returnDict = [[NSMutableDictionary alloc] initWithCapacity:self.count];
