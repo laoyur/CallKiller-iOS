@@ -40,9 +40,9 @@ if [[ $? -ne "0" ]]; then
 fi
 
 sudo rm -fr dpkg-tmp
-mkdir -p dpkg-tmp/var/mobile/callkiller
+mkdir -p dpkg-tmp/tmp/callkiller
 cp -r callkiller/Package/* dpkg-tmp/
-cp phone-*.dat dpkg-tmp/var/mobile/callkiller/
+cp phone-*.dat dpkg-tmp/tmp/callkiller/
 rm -f dpkg-tmp/Library/.DS_Store
 rm -f dpkg-tmp/Library/.gitignore
 rm -f dpkg-tmp/Library/MobileSubstrate/.DS_Store
@@ -83,6 +83,10 @@ EOF
 
 cat > dpkg-tmp/DEBIAN/postinst << EOF
 #!/bin/sh
+mkdir -p /var/mobile/callkiller
+rm -f /var/mobile/callkiller/phone-*.dat
+mv /tmp/callkiller/* /var/mobile/callkiller/
+rm -fr /tmp/callkiller
 chown -R mobile:mobile /var/mobile/callkiller
 chmod -R 755 /var/mobile/callkiller
 if [[ -e /var/mobile/callkiller-pref.json ]]; then
