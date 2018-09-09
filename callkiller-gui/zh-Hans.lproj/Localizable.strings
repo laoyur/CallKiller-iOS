@@ -4,6 +4,7 @@
 "city-block-count-fmt" = "%ld 个城市";
 "record-count-fmt" = "%ld 条记录";
 "no-config" = "未配置";
+"no-records" = "无记录";
 "no-donation" = "尚无捐赠";
 "donation-list" = "捐赠名单";
 "donate-alipay" = "支付宝捐赠";
@@ -32,6 +33,11 @@
 "add-keyword-content" = "不支持通配符";
 "del-all-keywords-prompt" = "确定清空关键词？";
 
+"enter-prefix-prompt" = "输入前缀";
+"add-prefix-title" = "增加前缀";
+"add-prefix-content" = "支持英文问号?通配符，代表单个数字";
+"del-all-prefixes-prompt" = "确定清空所有前缀？";
+
 "unknown" = "未知";
 "mobile-query-location-fmt" = "查询耗时：%.6f ms\n归属地：%@\n区号：%@";
 "mobile-query-placeholer" = "请输入11位手机号";
@@ -41,3 +47,16 @@
 "eula-content" = "本软件为免费软件。\n因使用本软件而引起的任何问题和责任（包括但不限于数据丢失、设备故障、漏接电话等），均由使用者本人承担。\n如果你不能接受，请立刻卸载本软件。\n个人开发者的辛酸与不易，望理解，更何况这是一款免费软件。";
 "check-all" = "全选中";
 "uncheck-all" = "全取消";
+
+"block-reason-unknown-number" = "未知号码";
+"block-reason-landline" = "区号拦截";
+"block-reason-mobile" = "归属地拦截";
+"block-reason-blacklist" = "黑名单拦截";
+"block-reason-keywords" = "关键词拦截";
+"block-reason-unknown" = "未知拦截类型";
+"block-reason-system" = "系统黑名单";
+
+"trash-history-alert-title" = "清空拦截记录";
+"trash-history-alert-content" = "确定清空吗？此操作无法恢复。";
+
+"restart-mp-prompt" = "此改动在强杀电话应用后才能生效！";

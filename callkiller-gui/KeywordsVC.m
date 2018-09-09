@@ -60,6 +60,7 @@
             [keywords addObject:keyword];
             [[Preference sharedInstance] save];
             [self.tableview reloadData];
+            self.trashButton.enabled = YES;
         }
     }];
     confirm.enabled = NO;

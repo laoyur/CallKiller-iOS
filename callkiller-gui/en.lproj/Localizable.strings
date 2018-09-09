@@ -4,6 +4,7 @@
 "city-block-count-fmt" = "%ld cities";
 "record-count-fmt" = "%ld records";
 "no-config" = "no items";
+"no-records" = "no items";
 "no-donation" = "No donations";
 "donation-list" = "Donation list";
 "donate-alipay" = "Donate with Alipay";
@@ -32,6 +33,11 @@
 "add-keyword-content" = "Wildcard is NOT supported";
 "del-all-keywords-prompt" = "Sure to delete all keywords?";
 
+"enter-prefix-prompt" = "Enter prefix";
+"add-prefix-title" = "Add prefix";
+"add-prefix-content" = "Wildcard ? is supported for a single digit";
+"del-all-prefixes-prompt" = "Sure to delete all items?";
+
 "unknown" = "Unknown";
 "mobile-query-location-fmt" = "time cost：%.6f ms\ncity：%@\narea number：%@";
 "mobile-query-placeholer" = "Please enter mobile phone number";
@@ -41,3 +47,16 @@
 "eula-content" = "Take your own risk to use this tweak! \nThe developer takes no responsibility for your missing calls.";
 "check-all" = "Check All";
 "uncheck-all" = "Uncheck All";
+
+"block-reason-unknown-number" = "Unknwon number";
+"block-reason-landline" = "Landline area";
+"block-reason-mobile" = "Mobile area";
+"block-reason-blacklist" = "Blacklist";
+"block-reason-keywords" = "Keywords";
+"block-reason-unknown" = "Unknown reason";
+"block-reason-system" = "Blocked by system";
+
+"trash-history-alert-title" = "Clear all history";
+"trash-history-alert-content" = "Sure to clear all history, cannot undo.";
+
+"restart-mp-prompt" = "You need to restart Phone app to view the change.";

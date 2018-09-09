@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041C841F211184CF001F3B84 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 041C841E211184CF001F3B84 /* MobileCoreServices.framework */; };
+		041C84242111CE68001F3B84 /* HistoryVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 041C84232111CE68001F3B84 /* HistoryVC.m */; };
+		041C84252111DA42001F3B84 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 041C841E211184CF001F3B84 /* MobileCoreServices.framework */; };
 		042B550A20FF6A0C00FE64AC /* RootVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 042B550920FF6A0C00FE64AC /* RootVC.m */; };
 		042B550D20FF6ACB00FE64AC /* ZoneVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 042B550C20FF6ACB00FE64AC /* ZoneVC.m */; };
 		042B551320FF703A00FE64AC /* Preference.m in Sources */ = {isa = PBXBuildFile; fileRef = 042B551220FF703A00FE64AC /* Preference.m */; };
@@ -62,6 +65,7 @@
 		04996BC921018D5100F8F38B /* AFURLRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 04996BC121018D5100F8F38B /* AFURLRequestSerialization.m */; };
 		04996BCA21018D5100F8F38B /* AFURLResponseSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 04996BC321018D5100F8F38B /* AFURLResponseSerialization.m */; };
 		04996BCB21018D5100F8F38B /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 04996BC521018D5100F8F38B /* AFURLSessionManager.m */; };
+		049E742121230ADB0048D969 /* IgnoredPrefixVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 049E742021230ADB0048D969 /* IgnoredPrefixVC.m */; };
 		04D3A6EF20FF654F00D1CC16 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 04D3A6EE20FF654F00D1CC16 /* AppDelegate.m */; };
 		04D3A6F520FF654F00D1CC16 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 04D3A6F320FF654F00D1CC16 /* Main.storyboard */; };
 		04D3A6F720FF654F00D1CC16 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04D3A6F620FF654F00D1CC16 /* Assets.xcassets */; };
@@ -100,6 +104,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		041C841E211184CF001F3B84 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		041C84202111901A001F3B84 /* MPRecentsTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPRecentsTableViewCell.h; sourceTree = "<group>"; };
+		041C8421211190A2001F3B84 /* MPRecentsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPRecentsTableViewController.h; sourceTree = "<group>"; };
+		041C84222111CE67001F3B84 /* HistoryVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HistoryVC.h; sourceTree = "<group>"; };
+		041C84232111CE68001F3B84 /* HistoryVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HistoryVC.m; sourceTree = "<group>"; };
 		042B550820FF6A0C00FE64AC /* RootVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootVC.h; sourceTree = "<group>"; };
 		042B550920FF6A0C00FE64AC /* RootVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootVC.m; sourceTree = "<group>"; };
 		042B550B20FF6ACB00FE64AC /* ZoneVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ZoneVC.h; sourceTree = "<group>"; };
@@ -213,6 +222,9 @@
 		04996BC421018D5100F8F38B /* AFURLSessionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFURLSessionManager.h; sourceTree = "<group>"; };
 		04996BC521018D5100F8F38B /* AFURLSessionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFURLSessionManager.m; sourceTree = "<group>"; };
 		0499A0BD210C17BD000A6861 /* CHRecentCall.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHRecentCall.h; sourceTree = "<group>"; };
+		049E741F21230ADB0048D969 /* IgnoredPrefixVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IgnoredPrefixVC.h; sourceTree = "<group>"; };
+		049E742021230ADB0048D969 /* IgnoredPrefixVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IgnoredPrefixVC.m; sourceTree = "<group>"; };
+		04BA295A21140280001C9084 /* SBRemoteAlertAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SBRemoteAlertAdapter.h; sourceTree = "<group>"; };
 		04D3A6EB20FF654F00D1CC16 /* callkiller-gui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "callkiller-gui.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04D3A6ED20FF654F00D1CC16 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		04D3A6EE20FF654F00D1CC16 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -228,6 +240,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				041C841F211184CF001F3B84 /* MobileCoreServices.framework in Frameworks */,
 				04984766210A041200B1EB00 /* libc++.tbd in Frameworks */,
 				0495EB0420FC3AD3006C6720 /* libsqlite3.tbd in Frameworks */,
 				0495EACF20FC2A9C006C6720 /* libstatics.a in Frameworks */,
@@ -250,6 +263,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				041C84252111DA42001F3B84 /* MobileCoreServices.framework in Frameworks */,
 				04984768210A04A200B1EB00 /* libc++.tbd in Frameworks */,
 				042B551620FF75B800FE64AC /* libstatics.a in Frameworks */,
 			);
@@ -283,6 +297,7 @@
 		04957CF820F621DD003F6E0B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				041C841E211184CF001F3B84 /* MobileCoreServices.framework */,
 				04984765210A041200B1EB00 /* libc++.tbd */,
 				0495EB0320FC3AD3006C6720 /* libsqlite3.tbd */,
 				044CEA9820F7A47100736308 /* libz.tbd */,
@@ -311,6 +326,9 @@
 				044CEA6420F7507B00736308 /* TUProxyCall.h */,
 				044CEA6520F7509300736308 /* TUHandle.h */,
 				0499A0BD210C17BD000A6861 /* CHRecentCall.h */,
+				041C84202111901A001F3B84 /* MPRecentsTableViewCell.h */,
+				041C8421211190A2001F3B84 /* MPRecentsTableViewController.h */,
+				04BA295A21140280001C9084 /* SBRemoteAlertAdapter.h */,
 			);
 			path = callkiller;
 			sourceTree = "<group>";
@@ -485,6 +503,7 @@
 				04D3A6F620FF654F00D1CC16 /* Assets.xcassets */,
 				04D3A6F820FF654F00D1CC16 /* LaunchScreen.storyboard */,
 				04D3A6FB20FF654F00D1CC16 /* Info.plist */,
+				049747A12104891F0006CB85 /* Localizable.strings */,
 				04D3A6FC20FF654F00D1CC16 /* main.m */,
 				042B550820FF6A0C00FE64AC /* RootVC.h */,
 				042B550920FF6A0C00FE64AC /* RootVC.m */,
@@ -497,7 +516,10 @@
 				0498F4702100869200A6A041 /* KeywordsVC.m */,
 				0498F4722100B21B00A6A041 /* AlertUtil.h */,
 				0498F4732100B21B00A6A041 /* AlertUtil.m */,
-				049747A12104891F0006CB85 /* Localizable.strings */,
+				041C84222111CE67001F3B84 /* HistoryVC.h */,
+				041C84232111CE68001F3B84 /* HistoryVC.m */,
+				049E741F21230ADB0048D969 /* IgnoredPrefixVC.h */,
+				049E742021230ADB0048D969 /* IgnoredPrefixVC.m */,
 			);
 			path = "callkiller-gui";
 			sourceTree = "<group>";
@@ -699,6 +721,7 @@
 				042B550A20FF6A0C00FE64AC /* RootVC.m in Sources */,
 				049847542109F10A00B1EB00 /* JGProgressHUDFadeAnimation.m in Sources */,
 				04996BC721018D5100F8F38B /* AFNetworkReachabilityManager.m in Sources */,
+				049E742121230ADB0048D969 /* IgnoredPrefixVC.m in Sources */,
 				0498475A2109F10A00B1EB00 /* JGProgressHUDRingIndicatorView.m in Sources */,
 				049847582109F10A00B1EB00 /* JGProgressHUDIndicatorView.m in Sources */,
 				04996BCB21018D5100F8F38B /* AFURLSessionManager.m in Sources */,
@@ -720,6 +743,7 @@
 				0498F46E2100868000A6A041 /* BlacklistVC.m in Sources */,
 				04996BC821018D5100F8F38B /* AFSecurityPolicy.m in Sources */,
 				0498475B2109F10A00B1EB00 /* JGProgressHUDShadow.m in Sources */,
+				041C84242111CE68001F3B84 /* HistoryVC.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,7 +18,7 @@
 "4fu-3x-1WL.text" = "Block landline number by area *";
 
 /* Class = "UILabel"; text = "内地手机号归属地测试"; ObjectID = "Aby-nN-l5F"; */
-"Aby-nN-l5F.text" = "Mobile phone number test";
+"xK9-lI-N2e.text" = "Mobile phone number test";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "Boe-Kq-JvX"; */
 "Boe-Kq-JvX.text" = "Label";
@@ -115,3 +115,12 @@
 
 /* Class = "UILabel"; text = "捐赠名单"; ObjectID = "qze-rW-gOX"; */
 "qze-rW-gOX.text" = "Open sourced components";
+
+"Aby-nN-l5F.text" = "Block history";
+"4py-b4-JiY.title" = "Block history";
+"pra-xj-Xb3.text" = "Inject to Phone app";
+"wig-6E-Wta.footerTitle" = "If inject-to-phone-app enabled:\n1. 🚫 will be shown aside the phonenumber which has been blocked by CallKiller;\n2. You can add phonenumber to CallKiller blacklist from right-to-left-swipe menu";
+
+"CLS-Db-QtD.text" = "Ignore phone prefix";
+"8j3-Oz-g5u.title" = "Ignore phone prefix";
+"a1C-Kr-EGr.text" = "Usage example:\n\nstep 1. add an item with '12583?',\nstep 2. incoming call phonenumber '12583113900010002' will be treated as '13900010002' for further processing.\n\nUseful or useless? Who knows!";

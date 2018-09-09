@@ -8,5 +8,11 @@
         <false/>
         <key>platform-application</key>
         <true/>
+        <key>com.apple.springboard.opensensitiveurl</key>
+        <true/>
+        <key>com.apple.backboardd.launchapplications</key>
+        <true/>
+        <key>com.apple.frontboard.launchapplications</key>
+        <true/>
     </dict>
 </plist>

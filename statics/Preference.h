@@ -18,17 +18,26 @@
 #define kKeyMobileBlockedCities @"mobile-blocked-cities" // 手机号按市拦截
 #define kKeyMobileBlockedCitiesFlattened @"mobile-blocked-cities-flattened" // for springboard
 #define kKeyBlacklist @"blacklist"
+#define kKeyIgnoredPrefixes @"ignored-prefixes"     // added in 1.4.3
 #define kKeyBlackKeywords @"keywords"
+
+#define kKeyMPInjectionEnabled @"mp-injection-enabled"
 
 @interface Preference : NSObject {
     NSMutableDictionary *_pref;
+    NSMutableDictionary *_mpPref;
 }
 
 +(instancetype)sharedInstance;
 +(NSDictionary*)load;
++(NSDictionary*)loadMPPref;
++(NSString*)mpPrefFilePath;
 
 -(NSMutableDictionary*)pref;
 -(void)save;
 -(void)saveOnly;
+
+-(NSMutableDictionary*)mpPref;
+-(void)saveMPPref;
 
 @end

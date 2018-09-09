@@ -10,24 +10,40 @@
 #import "statics.h"
 #import "Preference.h"
 #import "AlertUtil.h"
+#import "GCDObjC.h"
 #import "AFNetworking.h"
 #import "MobileRegionDetector.h"
+#import "HistoryVC.h"
+#import <notify.h>
 
-#define kDonationAlipayAccount @"PLACEHOLER"
+#define kDonationAlipayAccount @"PLACEHOLDER"
+
+@interface LSBundleProxy
+@property (nonatomic, readonly) NSURL *dataContainerURL;
++ (id)bundleProxyForIdentifier:(id)arg1;
+@end
 
 @interface RootVC ()
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *enableSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *MPSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *blockingUnknownSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *contactBypassSwitch;
 @property (weak, nonatomic) IBOutlet UILabel *citiesBlockedCount;
 @property (weak, nonatomic) IBOutlet UILabel *mobileCitiesBlockedCount;
 @property (weak, nonatomic) IBOutlet UILabel *blackListCountLabel;
 @property (weak, nonatomic) IBOutlet UILabel *blackKeywordsCount;
+@property (weak, nonatomic) IBOutlet UILabel *ignoredPrefixCount;
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UILabel *phonedatVersionLabel;
+@property (weak, nonatomic) IBOutlet UILabel *historyCount;
+
 @property (copy, nonatomic) NSArray *cityGroups;
+@property (strong, nonatomic) NSMutableArray *history;
+@property (nonatomic) BOOL isLoadingHistory;
+@property (nonatomic) BOOL refreshHistoryCountOnViewAppear;
+
 @end
 
 @implementation RootVC
@@ -37,10 +53,21 @@
     
     NSString *jsonFilePath = [[NSBundle mainBundle] pathForResource:@"cities" ofType:@"json"];
     self.cityGroups = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:jsonFilePath] options:kNilOptions error:nil];
+   
+    self.history = [NSMutableArray new];
+    [self loadHistory];
+    
+    int token;
+    notify_register_dispatch(kMPHistoryAddedNotification, &token, dispatch_get_main_queue(), ^(int token) {
+        [self loadHistory];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"mp-history-added" object:nil];
+    });
+    [[NSNotificationCenter defaultCenter] addObserverForName:@"mp-history-deleted-by-user" object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
+        self.refreshHistoryCountOnViewAppear = YES;
+    }];
     
     NSMutableDictionary *pref = [[Preference sharedInstance] pref];
-    
-    
+    NSMutableDictionary *mpPref = [[Preference sharedInstance] mpPref];
     // 修正1.3.0的一处bug
     // 重新同步拦截的城市
     if (!pref[kKeyPrefVersion]) {
@@ -86,6 +113,7 @@
     
     self.statusLabel.text = [pref[kKeyEnabled] boolValue] ? NSLocalizedString(@"enabled", nil) : NSLocalizedString(@"disabled", nil);
     [self.enableSwitch setOn:[pref[kKeyEnabled] boolValue] animated:NO];
+    [self.MPSwitch setOn:[mpPref[kKeyMPInjectionEnabled] boolValue] animated:NO];
     [self.blockingUnknownSwitch setOn:[pref[kKeyBlockUnknown] boolValue] animated:NO];
     [self.contactBypassSwitch setOn:[pref[kKeyBypassContacts] boolValue] animated:NO];
 }
@@ -114,17 +142,62 @@
         self.blackListCountLabel.text = NSLocalizedString(@"no-config", nil);
     }
     
+    NSArray *ignoredPrefixes = pref[kKeyIgnoredPrefixes];
+    if (ignoredPrefixes.count > 0) {
+        self.ignoredPrefixCount.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), ignoredPrefixes.count];
+    } else {
+        self.ignoredPrefixCount.text = NSLocalizedString(@"no-config", nil);
+    }
+    
     NSArray *keywords = pref[kKeyBlackKeywords];
     if (keywords.count > 0) {
         self.blackKeywordsCount.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), keywords.count];
     } else {
         self.blackKeywordsCount.text = NSLocalizedString(@"no-config", nil);
     }
+    
+    if (self.refreshHistoryCountOnViewAppear) {
+        self.refreshHistoryCountOnViewAppear = NO;
+        if (self.history.count)
+            self.historyCount.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), self.history.count];
+        else
+            self.historyCount.text = NSLocalizedString(@"no-records", nil);
+    }
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)loadHistory {
+    if (self.isLoadingHistory)
+        return;
+    
+    self.isLoadingHistory = YES;
+    self.historyCount.text = @"loading...";
+    [self.history removeAllObjects];
+    
+    [[GCDQueue globalQueue] queueBlock:^{
+        LSBundleProxy *mobilephone = [LSBundleProxy bundleProxyForIdentifier:@"com.apple.mobilephone"];
+        NSString *mpHistoryFilePath = [NSString stringWithFormat:@"%@/Documents/%@", mobilephone.dataContainerURL.path, kMPHistoryFileName];
+        NSString *list = [NSString stringWithContentsOfFile:mpHistoryFilePath encoding:NSUTF8StringEncoding error:nil];
+        NSArray *rows = [list componentsSeparatedByString:@"\n"];
+        for (NSString *row in rows) {
+            if (!row.length)
+                continue;
+            NSDictionary *record = [NSJSONSerialization JSONObjectWithData:[row dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:nil];
+            if (record)
+                [self.history insertObject:record atIndex:0];
+        }
+        [[GCDQueue mainQueue] queueBlock:^{
+            self.isLoadingHistory = NO;
+            if (self.history.count)
+                self.historyCount.text = [NSString stringWithFormat:NSLocalizedString(@"record-count-fmt", nil), self.history.count];
+            else
+                self.historyCount.text = NSLocalizedString(@"no-records", nil);
+        }];
+    }];
 }
 
 - (NSDictionary *)findCitiesGroupByGroup:(NSString *)group {
@@ -147,6 +220,10 @@
     } else if (sender == self.contactBypassSwitch) {
         [[Preference sharedInstance] pref][kKeyBypassContacts] = @(self.contactBypassSwitch.isOn);
         [[Preference sharedInstance] save];
+    } else if (sender == self.MPSwitch) {
+        [[Preference sharedInstance] mpPref][kKeyMPInjectionEnabled] = @(self.MPSwitch.isOn);
+        [[Preference sharedInstance] saveMPPref];
+        [AlertUtil showInfo:NSLocalizedString(@"restart-mp-prompt", nil) message:nil];
     }
 }
 - (IBAction)onExit:(id)sender {
@@ -170,6 +247,9 @@
         [self.navigationController pushViewController:zone animated:YES];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.blacklist"]) {
         UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.blacklist"];
+        [self.navigationController pushViewController:vc animated:YES];
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.ignored-prefix"]) {
+        UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.ignored-prefix"];
         [self.navigationController pushViewController:vc animated:YES];
     } else if ([cell.reuseIdentifier isEqualToString:@"cell.keywords"]) {
         UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.blackkeywords"];
@@ -259,7 +339,6 @@
             } else {
                 code = NSLocalizedString(@"unknown", nil);
             }
-            
             [AlertUtil showInfo:phone message:[NSString stringWithFormat:NSLocalizedString(@"mobile-query-location-fmt", nil), 
                                                interval * 1000, 
                                                locationString,
@@ -274,7 +353,15 @@
         UIViewController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.opensource"];
         [self.navigationController pushViewController:vc animated:YES];
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    } 
+    } else if ([cell.reuseIdentifier isEqualToString:@"cell.history"]) {
+        if (self.isLoadingHistory || self.history.count == 0) {
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        } else {
+            HistoryVC *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:nil] instantiateViewControllerWithIdentifier:@"sb.history"];
+            vc.history = self.history;
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }
 }
 
 - (NSDictionary *)findCityInfoWithCode:(NSString *)code {

@@ -18,7 +18,7 @@
 "4fu-3x-1WL.text" = "按区号拦截固话 *";
 
 /* Class = "UILabel"; text = "内地手机号归属地测试"; ObjectID = "Aby-nN-l5F"; */
-"Aby-nN-l5F.text" = "内地手机号归属地查询";
+"xK9-lI-N2e.text" = "内地手机号归属地查询";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "Boe-Kq-JvX"; */
 "Boe-Kq-JvX.text" = "Label";
@@ -115,3 +115,12 @@
 
 /* Class = "UILabel"; text = "捐赠名单"; ObjectID = "qze-rW-gOX"; */
 "qze-rW-gOX.text" = "开源组件";
+
+"Aby-nN-l5F.text" = "拦截记录";
+"4py-b4-JiY.title" = "拦截记录";
+"pra-xj-Xb3.text" = "集成到电话应用";
+"wig-6E-Wta.footerTitle" = "集成到电话应用后:\n1. 被拦截的电话旁会显示🚫标记；\n2. 可以通过左滑菜单把号码快速加入到CallKiller黑名单。";
+
+"CLS-Db-QtD.text" = "匹配时忽略号码前缀";
+"8j3-Oz-g5u.title" = "忽略号码前缀";
+"a1C-Kr-EGr.text" = "使用说明：\n此功能的典型用例，是处理移动的「和多号」业务。\n当副卡来电时，号码前会自动加上 12583x 前缀。\n因此添加条目「12583?」即可忽略这些副卡前缀。\n举例来说，若来电号码是 12583113900010002 ，它将被视作 13900010002 进行后续处理。\n\n其他使用场景？作者也不知道，请自行挖掘。";

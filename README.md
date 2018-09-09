@@ -4,6 +4,10 @@
 ![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-14.jpg)
 ![](https://laoyur.com/dl/ios/callkiller/photo_2018-07-20_18-42-18.jpg)
 
+# changes in 1.5.1
+ * 兼容中国移动和多号业务
+ * 来电时主动静音，若无需拦截，再进行响铃，以保证发生拦截时不会出现响一声的情况
+
 # changes in 1.3.2
   * 理论上也支持 iOS 10
   * 支持按归属地拦截手机号
